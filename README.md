@@ -1,3 +1,3 @@
 # dbms-fuzz
-A fuzzing project for databse management system.
+A fuzzing project for everything.
  using libAFL
