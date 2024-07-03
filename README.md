@@ -1,3 +1,3 @@
-# everything-fuzzing
-A fuzzing project for everything.
+# fuxxing-fuzzing
+A fuzzing project for binary.
  using libAFL
