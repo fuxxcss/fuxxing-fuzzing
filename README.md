@@ -1,3 +1,2 @@
 # fuxxing-fuzzing
-A fuzzing project for binary.
- using libAFL
+A fuzzing project using libAFL.
