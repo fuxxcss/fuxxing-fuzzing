@@ -1,0 +1,14 @@
+CREATE TABLE a (i int PRIMARY KEY);
+CREATE TABLE b (a_id int);
+INSERT INTO a VALUES (0), (1), (2), (3);
+INSERT INTO b SELECT generate_series(1,1000) % 4;
+DROP TABLE a,b;
+SET client_min_messages = error;
+RESET client_min_messages;
+SET allow_system_table_mods = ON;
+ALTER TRIGGER t1 ON pg_description RENAME TO t2;
+DROP TRIGGER t2 ON pg_description;
+CREATE VIEW v1 AS SELECT * FROM a;
+CREATE OR REPLACE v1 AS SELECT * FROM b;
+ALTER VIEW v1 RENAME TO v2;
+DROP VIEW IF EXISTS v2;

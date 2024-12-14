@@ -1,0 +1,21 @@
+CREATE TRIGGER t1 BEFORE INSERT ON pg_description EXECUTE FUNCTION tf1();
+ALTER TRIGGER t1 ON pg_description RENAME TO t2;
+SET allow_system_table_mods TO on;
+RESET allow_system_table_mods;
+SET allow_system_table_mods TO on;
+RESET allow_system_table_mods;
+SET allow_system_table_mods = on;
+BEGIN;
+CREATE TABLE pg_catalog.test (a int);
+ROLLBACK;
+BEGIN;
+CREATE TABLE t1 (a int, b anyarray);
+ROLLBACK;
+BEGIN;
+ALTER TABLE pg_namespace ADD CONSTRAINT foo UNIQUE USING INDEX pg_namespace_nspname_index;
+ROLLBACK;
+BEGIN;
+INSERT INTO pg_description (objoid, classoid, objsubid, description) VALUES (0, 0, 2, 'foo');
+ROLLBACK;
+INSERT INTO pg_description (objoid, classoid, objsubid, description) VALUES (0, 0, 3, 'foo');
+
