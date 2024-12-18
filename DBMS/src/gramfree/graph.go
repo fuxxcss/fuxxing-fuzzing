@@ -26,20 +26,12 @@ const(
 )
     
 const(
-    // related DBMS
-    MTYPE_rdb_view MetaType = iota
-    MTYPE_rdb_table
-    MTYPE_rdb_trigger 
-    MTYPE_rdb_index
-    MTYPE_rdb_rule
-    MTYPE_rdb_policy
-    MTYPE_rdb_int
-    MTYPE_rdb_str
-    // not-related DBMS
-    MTYPE_nrdb_hash
-    MTYPE_nrdb_str
-    MTYPE_nrdb_list
-    MTYPE_nrdb_set
+    // No-SQL types
+    MTYPE_hash = iota
+    MTYPE_str
+    MTYPE_list
+    MTYPE_set
+    MTYPE_zset
     // default
     MTYPE_default
 )

@@ -4,7 +4,7 @@ package db
 #cgo LDFLAGS: -L/usr/local/hiredis-1.2.0/ -lredis
 #include "/usr/local/hiredis-1.2.0/hiredis.h"
 */
-/*
+
 import "C"
 
 import (
@@ -124,4 +124,3 @@ func (self *PostgresqlClient) Restart() bool {
 	}
 	return true
 }
-*/

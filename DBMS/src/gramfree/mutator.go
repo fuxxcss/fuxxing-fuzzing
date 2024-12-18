@@ -29,14 +29,14 @@ func (self *Mutator) Init() {
 	self.Testcase = ""
 }
 
-func (self *Mutator) Calculate_line(lines string,dbtp DBMSType) int {
+func (self *Mutator) Calculate_line(lines string,dbms string) int {
     var lines_len int
-    switch dbtp {
-    case RDB :
-        // usually, sqls is sliced by ; 
+    switch dbms {
+    case MongoDB,AgensGraph :
+        // statements is sliced by ; 
         lines_len = strings.Count(lines,";")
-    case NRDB :
-        // command is sliced by \n
+    case Redis,KeyDB :
+        // commands is sliced by \n
         lines_len = strings.Count(lines,"\n")
     }
     return lines_len

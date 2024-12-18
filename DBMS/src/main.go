@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	dbtype gramfree.DBMSType
+	dbms string
 	client gramfree.Client // interface
 	mutator *gramfree.Mutator
 )
@@ -59,7 +59,7 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 	}
 	// add this testcase to Corpus
 	last := mutator.Corpus_last()
-	testcase_len := mutator.Calculate_line(testcase,dbtype)
+	testcase_len := mutator.Calculate_line(testcase,dbms)
 	if (last == "" || strings.Compare(last,testcase) != 0) && testcase_len != 0 {
 		mutator.Corpus_add(testcase,testcase_len)
 	}else { return status }
@@ -72,11 +72,10 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 
 func main() {
 	var ret bool
-	dbms := os.Getenv(gramfree.DBMS)
+	dbms = os.Getenv(gramfree.DBMS)
 	switch dbms {
-	case gramfree.PG :
-		dbtype = gramfree.RDB
-		client = new(db.PostgresqlClient)
+	case gramfree.Redis :
+		client = new(db.RedisClient)
 		ret = client.Connect(gramfree.User,gramfree.Passwd,gramfree.DBName)
 	/*
 	case gramfree.RD :

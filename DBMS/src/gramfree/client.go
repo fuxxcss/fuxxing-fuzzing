@@ -1,33 +1,20 @@
 package gramfree
 
-type DBMSType uint8
 type DBMStatus uint8
 type ClientP *Client
 
-var (
-	AFL_SHM_ID string
-	MUT_SHM_ID string
-)
-
 const (
-	// rdb login
-	User = "fuzzer"
-	Passwd = "goodluck"
-	DBName = "fuzzdb"
 	// redis
-	RD_IP = "127.0.0.1"
-	RD_PORT = "6379"
+	Redis_IP = "127.0.0.1"
+	Redis_PORT = "6379"
 	// shared memory
 	AFL_SHM_ENV = "SHM_ID"
 	// dbms
 	DBMS = "DBMS"
-	PG = "postgresql"
-	RD = "redis"
-)
-
-const (
-	RDB DBMSType = iota
-	NRDB
+	Redis = "redis"
+	KeyDB = "keydb"
+	MongoDB = "mongodb"
+	AgensGraph = "agensgraph"
 )
 
 const (

@@ -1,12 +1,57 @@
-# DBMS
-fuxxing database management system.
-## go build
+# No-SQL Fuzzer
+* [What is it ?](#introduction)
+* [Prepare DBMS](#prepare-targets)
+   * [Redis](#redis)
+   * [KeyDB](#keydb)
+   * [MongoDB](#mongodb)
+   * [AgensGraph](#agensgraph)
+* [How to Install ?](#install)
+* [How to Use ?](#fuzz)
+
+## introduction
+This is a Project fuxxing No-SQL Database Management System.<br>
+Target No-SQL DBMS:
+``` shell
+1. Redis (key-value)
+2. KeyDB (key-value)
+3. MongoDB (JSON Doc)
+4. AgensGraph (Cyper)
+```
+
+## prepare targets
+### redis
+redis fuzz required:
+- instrument redis
+- hiredis
+instrument redis-server,if you dont have afl-clang-lto,look up here[afl-clang-lto](#afl-clang-lto)
+``` shell
+cd /usr/local/redis
+AFL_USE_ASAN=1 CC=afl-clang-lto make
+```
+activate redis: 
+``` shell
+> AFL_DEBUG=1 /usr/local/redis/src/redis-server # __afl_map_size ssss
+> ^C
+> ipcmk -M ssss -p 0666 #Shared memory id: xxxx
+> AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx src/redis-server &
+```
+### keydb
+``` shell
+export AFL_USE_ASAN=1
+export CC=afl-cc
+export CXX=afl-c++
+```
+### mongodb
+### agensgraph
+
+## install
+### go build
 please do thease after dbms init.
 ``` shell
 > go install -buildmode=shared -linkshared std
 > ./install.sh
 ```
-## afl build
+### afl build
 in order to use shmem for afl-fuzz, dbms server.<br>
 add
 ``` shell
@@ -25,76 +70,20 @@ if (shm->cmplog_mode) {
     ...
 }
 ```
+### afl-clang-lto
 in order to use afl-clang-lto, for example, your llvm version is 16 and lld-16 was installed.
 ``` shell
 export LLVM_CONFIG=llvm-config-16
 make && make install
 ```
-## dbms init
-### postresql fuzz
-postgresql fuzz required: 
-we need two version : 
-- instrument postresql (dir pgsql-inst)
-- no-instrument (dir pgsql)<br>
-instrument postresql :<br>add 
-``` shell
-export AFL_USE_ASAN=1
-export CC=afl-cc
-export CXX=afl-c++
-```
-into postgresql-xx.x/configure, then
-``` shell
-> ./configure --prefix=/usr/local/pgsql-inst
-> make -j4 && make install
-```
-create dir /usr/local/pgsql-inst/data<br>
-``` shell
-> chown -R postgres /usr/local/pgsql-inst
-> su postgres
-> AFL_IGNORE_PROBLEMS=1 /usr/local/pgsql-inst/bin/initdb -D /usr/local/pgsql-inst/data
-```
-no-instrument postgresql:<br>
-normal install, maybe need make clean
-create new user and new database:<br>
-``` shell
-> su postgres
-> /usr/local/pgsql-inst/bin/psql
-postgres=# create user fuzzer superuser password 'goodluck';
-postgres=# create database fuzzdb owner fuzzer;
-postgres=# grant all privileges on database fuzzdb to fuzzer;
-```
-activate postgresql : 
-``` shell
-> su postgres
-> AFL_DEBUG=1 /usr/local/pgsql-inst/bin/postgres -D /usr/local/pgsql-inst/data # __afl_map_size 2097152
-> ^C
-> ipcmk -M 2097152 -p 0666 #Shared memory id: xxxx
-> AFL_MAP_SIZE=2097152 __AFL_SHM_ID=xxxx /usr/local/pgsql-inst/bin/postgres -D /usr/local/pgsql-inst/data &
-```
-### redis fuzz
-redis fuzz required:
-- instrument redis
-- hiredis
-instrument redis-server:
-``` shell
-cd /usr/local/redis
-AFL_USE_ASAN=1 CC=afl-clang-lto make 
-```
-activate redis: 
-``` shell
-> AFL_DEBUG=1 /usr/local/redis/src/redis-server # __afl_map_size ssss
-> ^C
-> ipcmk -M ssss -p 0666 #Shared memory id: xxxx
-> AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx src/redis-server &
-```
-## dbms fuzz
+## fuzz
 add
 ``` shell
 export AFL_MAP_SIZE=ssss
 export SHM_ID=xxxx # different from __AFL_SHM_ID
 ```
 into run.sh
-
 ``` shell
-DBMS=xxx ./run.sh
+#select xxx from (redis,keydb,mongodb,agensgraph)
+DBMS=xxx ./run.sh 
 ```

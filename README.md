@@ -1,2 +1,6 @@
 # fuxxing-fuzzing
-A fuzzing project using libAFL 0.13.0.
+A fuxxing project.
+## ABHD
+fuxxing examples in _< A Bug Hunters Diary >_
+## DMS
+fuxxing target No-SQL DBMS 
