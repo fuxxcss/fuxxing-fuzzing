@@ -73,9 +73,9 @@ func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
 }
 
 // return tuple (name,type,parent_name)
-func (self *PostgresqlClient) Select_metadata() [][3]string {
-	cstr := C.CString(SelectMetadata)
-	res := C.PQexec(self.conn,cstr)
+func (self *PostgresqlClient) Collect_metadata() [][3]string {
+	keystr := C.CString("KEYS *")
+	res := C.redisCommand(self.conn,keystr)
 	len := C.PQntuples(res) - 1
 	ret := make([][3]string,0)
 	var tuple [3]string

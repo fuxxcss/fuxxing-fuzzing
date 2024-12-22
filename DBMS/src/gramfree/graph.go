@@ -284,32 +284,17 @@ func (self *Graph) Build_graph(stmtstr string){
 func (self *Graph) Build_metamap(nm string,tp string,pnm string){
     var mtp MetaType
     switch tp {
-    // rdb
-    case "RDB_INT" :
-        mtp = MTYPE_rdb_int
-    case "RDB_STR" :
-        mtp = MTYPE_rdb_str
-    case "RDB_TABLE" :
-        mtp = MTYPE_rdb_table
-    case "RDB_TRIGGER" :
-        mtp = MTYPE_rdb_trigger
-    case "RDB_VIEW" :
-        mtp = MTYPE_rdb_view
-    case "RDB_INDEX" :
-        mtp = MTYPE_rdb_index
-    case "RDB_RULE" :
-        mtp = MTYPE_rdb_rule
-    case "RDB_POLICY" :
-        mtp = MTYPE_rdb_policy
-    // nrdb
-    case "NRDB_STR" :
-        mtp = MTYPE_nrdb_str
-    case "NRDB_HASH" :
-        mtp = MTYPE_nrdb_hash
-    case "NRDB_LIST" :
-        mtp = MTYPE_nrdb_list
-    case "NRDB_SET" :
-        mtp = MTYPE_nrdb_set
+    // No-SQL type
+    case "STR" :
+        mtp = MTYPE_str
+    case "HASH" :
+        mtp = MTYPE_hash
+    case "LIST" :
+        mtp = MTYPE_list
+    case "SET" :
+        mtp = MTYPE_set
+    case "ZSET" :
+        mtp = MTYPE_zset
     // default
     default :
         mtp = MTYPE_default
