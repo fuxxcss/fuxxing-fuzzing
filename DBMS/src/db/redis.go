@@ -11,7 +11,6 @@ import (
 	//"os"
 	"os/exec"
 	"fmt"
-
 	"DBMS/gramfree"
 )
 
@@ -43,7 +42,7 @@ func (self *RedisClient) Reconnect() bool {
 }
 
 func (self *RedisClient) Check_alive() bool {
-	res := C.redisCommand(self.conn,"info")
+	res := C.redisCommand(self.conn,"ping")
 	if res == nil || res.err { return false }
 	return true
 }
@@ -73,19 +72,51 @@ func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
 }
 
 // return tuple (name,type,parent_name)
-func (self *PostgresqlClient) Collect_metadata() [][3]string {
+func (self *RedisClient) Collect_metadata() [][3]string {
 	keystr := C.CString("KEYS *")
-	res := C.redisCommand(self.conn,keystr)
-	len := C.PQntuples(res) - 1
+	reply := C.redisCommand(self.conn,keystr)
 	ret := make([][3]string,0)
 	var tuple [3]string
 	var name string
+	for num =0 ; num < reply.elements ; num ++ {
+		name = reply.element[num].str
+		// type
+		var tp string
+		tpstr := C.CString("TYPE %s",name)
+		types = C.redisCommand(self.conn,tpstr).str
+		switch types {
+		case "string"
+			tp = "STR"
+		case "hash" :
+			tp = "HASH"
+			hashstr := C.CString("HKEYS %s",name)
+			...
+		case "list" :
+			tp = "LIST"
+		case "set" :
+			tp = "SET"
+		case "ZSET" :
+			tp = "zset"
+		case "stream" :
+			tp = "STREAM"
+			...
+		case "geo" :
+			tp = "GEO"
+		default :
+			tp = ""
+		}
+		tuple[1] = tp
+		// parent_name
+		pname := C.GoString(C.PQgetvalue(res,len,2))
+		tuple[2] = pname
+		//fmt.Println("name:",name,",type:",tp,",pname:",pname)
+		ret = append(ret,tuple)
+	}
 	for ; len >= 0 ; len-- {
 		// name
 		name = C.GoString(C.PQgetvalue(res,len,0))
 		tuple[0] = name
-		// type
-		var tp string
+		
 		types := C.GoString(C.PQgetvalue(res,len,1))
 		switch types {
 		case "integer","smallint","serial","smallserial","bigint","bigserial" :
@@ -113,8 +144,9 @@ func (self *PostgresqlClient) Collect_metadata() [][3]string {
 	return ret
 }
 
-func (self *PostgresqlClient) Restart() bool {
-	//os.Setenv() todo
+func (self *RedisClient) Restart() bool {
+	os.Setenv("AFL_MAP_SIZE",gramfree.AFL_MAP_SIZE)
+	os.Setenv("__AFL_SHM_ID",gramfree.__AFL_SHM_ID)
 	program := "/usr/local/redis/src/redis-server"
 	arg1 := "&"
 	cmd := exec.Command(program,arg1)

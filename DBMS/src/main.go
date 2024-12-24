@@ -72,16 +72,18 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 
 func main() {
 	var ret bool
-	dbms = os.Getenv(gramfree.DBMS)
+	/*	get envs	*/
+	dbms = os.Getenv("DBMS")
+	gramfree.__AFL_SHM_ID = os.Getenv("SHM_ID")
+	gramfree.AFL_MAP_SIZE = os.Getenv("AFL_MAP_SIZE")
 	switch dbms {
 	case gramfree.Redis :
 		client = new(db.RedisClient)
 		ret = client.Connect(gramfree.User,gramfree.Passwd,gramfree.DBName)
 	/*
-	case gramfree.RD :
-		dbtype = gramfree.NRDB
-		client = new(db.RedisClient)
-		ret = client.Connect(gramfree.RD_IP,gramfree.RD_PORT)
+	case gramfree.KeyDB :
+		client = new(db.KeyDBClient)
+		ret = client.Connect()
 	*/
 	default :
 		panic("please export DBMS")

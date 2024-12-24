@@ -1,0 +1,26 @@
+//dbs
+SELECT 1
+SELECT 2
+SELECT 3
+SELECT 4
+SELECT 5
+
+//trunc
+MULTI
+DISCARD
+UNWATCH
+WATCH [key1 key2 ...]
+EXEC
+
+// script
+SCRIPT LOAD [script]
+EVAL [script] [key1 key2 ...]
+SCRIPT EXISTS [script]
+SCRIPT FLUSH
+SCRIPT KILL
+
+//connect
+AUTH [passwd]
+ECHO [mess]
+PING
+

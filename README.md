@@ -1,4 +1,4 @@
-# fuxxing-fuzzing
+# fuxxing fuzzing
 A fuxxing project.
 ## ABHD
 fuxxing examples in _< A Bug Hunters Diary >_

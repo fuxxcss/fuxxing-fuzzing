@@ -80,10 +80,10 @@ make && make install
 add
 ``` shell
 export AFL_MAP_SIZE=ssss
-export SHM_ID=xxxx # different from __AFL_SHM_ID
+export SHM_ID=xxxx # same as __AFL_SHM_ID
 ```
 into run.sh
 ``` shell
-#select xxx from (redis,keydb,mongodb,agensgraph)
-DBMS=xxx ./run.sh 
+#select db from (redis,keydb,mongodb,agensgraph)
+DBMS=db ./run.sh 
 ```

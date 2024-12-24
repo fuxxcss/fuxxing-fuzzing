@@ -26,12 +26,14 @@ const(
 )
     
 const(
-    // No-SQL types
+    // redis types
     MTYPE_hash = iota
     MTYPE_str
     MTYPE_list
     MTYPE_set
     MTYPE_zset
+    MTYPE_stream
+    MTYPE_geo
     // default
     MTYPE_default
 )
@@ -284,7 +286,7 @@ func (self *Graph) Build_graph(stmtstr string){
 func (self *Graph) Build_metamap(nm string,tp string,pnm string){
     var mtp MetaType
     switch tp {
-    // No-SQL type
+    // redis type
     case "STR" :
         mtp = MTYPE_str
     case "HASH" :
@@ -295,6 +297,10 @@ func (self *Graph) Build_metamap(nm string,tp string,pnm string){
         mtp = MTYPE_set
     case "ZSET" :
         mtp = MTYPE_zset
+    case "STREAM" :
+        mtp = MTYPE_stream
+    case "GEO" :
+        mtp = MTYPE_geo
     // default
     default :
         mtp = MTYPE_default

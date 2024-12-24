@@ -3,14 +3,16 @@ package gramfree
 type DBMStatus uint8
 type ClientP *Client
 
+var (
+	AFL_MAP_SIZE int
+	__AFL_SHM_ID int
+)
+
 const (
 	// redis
 	Redis_IP = "127.0.0.1"
 	Redis_PORT = "6379"
-	// shared memory
-	AFL_SHM_ENV = "SHM_ID"
 	// dbms
-	DBMS = "DBMS"
 	Redis = "redis"
 	KeyDB = "keydb"
 	MongoDB = "mongodb"

@@ -1,5 +1,5 @@
 #!/bin/bash
-export DBMS=postgresql
+export DBMS=redis
 export AFL_CUSTOM_MUTATOR_ONLY=1
 export AFL_CUSTOM_MUTATOR_LIBRARY=build/libcustom.so
 export AFL_DISABLE_TRIM=1
