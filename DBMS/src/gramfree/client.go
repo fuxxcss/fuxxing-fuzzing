@@ -4,8 +4,8 @@ type DBMStatus uint8
 type ClientP *Client
 
 var (
-	AFL_MAP_SIZE int
-	__AFL_SHM_ID int
+	AFL_MAP_SIZE string
+	AFL_SHM_ID string
 )
 
 const (

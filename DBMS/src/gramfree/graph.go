@@ -27,6 +27,7 @@ const(
     
 const(
     // redis types
+    // keys
     MTYPE_hash = iota
     MTYPE_str
     MTYPE_list
@@ -34,6 +35,9 @@ const(
     MTYPE_zset
     MTYPE_stream
     MTYPE_geo
+    //filed
+    MTYPE_filed
+
     // default
     MTYPE_default
 )
@@ -301,6 +305,8 @@ func (self *Graph) Build_metamap(nm string,tp string,pnm string){
         mtp = MTYPE_stream
     case "GEO" :
         mtp = MTYPE_geo
+    case "FIELD" :
+        mtp = MTYPE_filed
     // default
     default :
         mtp = MTYPE_default

@@ -1,17 +1,34 @@
 package db
 
+// add #define type Type before redisReply
+
 /*
 #cgo LDFLAGS: -L/usr/local/hiredis-1.2.0/ -lredis
 #include "/usr/local/hiredis-1.2.0/hiredis.h"
-*/
 
+redisReply *redisCommand_wrapper(redisContext * rc,const char *format,char *arg){
+	redisReply *res;
+	res = redisCommand(rc,format,arg);
+	return res;
+}
+*/
 import "C"
 
 import (
-	//"os"
+	"os"
 	"os/exec"
-	"fmt"
+	//"fmt"
+	"strings"
 	"DBMS/gramfree"
+)
+
+// Commands
+var (
+	Format = C.CString("%s")
+	Ping = C.CString("PING")
+	Flushall = C.CString("FLUSHALL")
+	TYPE = C.CString("TYPE %s")
+	HKeys = C.CString("HKEYS %s")
 )
 
 type RedisClient struct {
@@ -23,8 +40,8 @@ type RedisClient struct {
 
 func (self *RedisClient) Connect(ip string,port int) bool {
 	// cgo string -> char*
-	conn := C.redisConnect(C.CString(ip),port)
-	if conn == nil || conn.err {
+	conn := C.redisConnect(C.CString(ip),C.int(port))
+	if conn == nil || conn.err != 0 {
 		self.status = gramfree.ConnectError
 		return false
 	}
@@ -42,21 +59,21 @@ func (self *RedisClient) Reconnect() bool {
 }
 
 func (self *RedisClient) Check_alive() bool {
-	res := C.redisCommand(self.conn,"ping")
-	if res == nil || res.err { return false }
+	res := C.redisCommand_wrapper(self.conn,Format,Ping)
+	if res == nil || res.Type == C.REDIS_REPLY_ERROR { return false }
 	return true
 }
 
 func (self *RedisClient) Clean_up() bool {
-	res := C.redisCommand(self.conn,"flushall")
-	if res == nil || res.err { return false }
+	res := C.redisCommand_wrapper(self.conn,Format,Flushall)
+	if res == nil || res.Type == C.REDIS_REPLY_ERROR { return false }
 	return true
 }
 
 func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
 	cstr := C.CString(command)
-	res := C.redisCommand(self.conn,cstr)
-	if res.type == REDIS_REPLY_ERROR {
+	res := C.redisCommand_wrapper(self.conn,Format,cstr)
+	if res.Type == C.REDIS_REPLY_ERROR {
 		// Crash
 		if strings.Contains(C.GoString(res.str),"Server is down") {
 			self.status = gramfree.Crash
@@ -74,23 +91,30 @@ func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
 // return tuple (name,type,parent_name)
 func (self *RedisClient) Collect_metadata() [][3]string {
 	keystr := C.CString("KEYS *")
-	reply := C.redisCommand(self.conn,keystr)
+	res := C.redisCommand_wrapper(self.conn,Format,keystr)
 	ret := make([][3]string,0)
 	var tuple [3]string
 	var name string
-	for num =0 ; num < reply.elements ; num ++ {
-		name = reply.element[num].str
+	num := uint(res.elements)
+	for ; num >= 0 ; num -- {
+		name = res.element[num].str
 		// type
 		var tp string
-		tpstr := C.CString("TYPE %s",name)
-		types = C.redisCommand(self.conn,tpstr).str
-		switch types {
-		case "string"
+		types := C.redisCommand_wrapper(self.conn,TYPE,name).str
+		switch C.GoString(types) {
+		case "string" :
 			tp = "STR"
 		case "hash" :
 			tp = "HASH"
-			hashstr := C.CString("HKEYS %s",name)
-			...
+			fileds := C.redisCommand_wrapper(self.conn,HKeys,name)
+			fnum := uint(fileds.elements)
+			for ; fnum >= 0 ; fnum -- {
+				var ftuple [3]string
+				ftuple[0] = fileds.element[fnum].str
+				ftuple[1] = "FIELD"
+				ftuple[2] = name
+				ret = append(ret,ftuple)
+			}
 		case "list" :
 			tp = "LIST"
 		case "set" :
@@ -99,54 +123,24 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 			tp = "zset"
 		case "stream" :
 			tp = "STREAM"
-			...
 		case "geo" :
 			tp = "GEO"
 		default :
 			tp = ""
 		}
-		tuple[1] = tp
-		// parent_name
-		pname := C.GoString(C.PQgetvalue(res,len,2))
-		tuple[2] = pname
-		//fmt.Println("name:",name,",type:",tp,",pname:",pname)
-		ret = append(ret,tuple)
-	}
-	for ; len >= 0 ; len-- {
-		// name
-		name = C.GoString(C.PQgetvalue(res,len,0))
 		tuple[0] = name
-		
-		types := C.GoString(C.PQgetvalue(res,len,1))
-		switch types {
-		case "integer","smallint","serial","smallserial","bigint","bigserial" :
-			tp = "RDB_INT"
-		case "character","character varying","text","bit","bit varying" :
-			tp = "RDB_STR"
-		case "TABLE" :
-			tp = "RDB_TABLE"
-		case "TRIGGER" :
-			tp = "RDB_TRIGGER"
-		case "VIEW" :
-			tp = "RDB_VIEW"
-		case "INDEX" :
-			tp = "RDB_INDEX"
-		default :
-			tp = ""
-		}
 		tuple[1] = tp
 		// parent_name
-		pname := C.GoString(C.PQgetvalue(res,len,2))
-		tuple[2] = pname
-		//fmt.Println("name:",name,",type:",tp,",pname:",pname)
+		tuple[2] = ""
 		ret = append(ret,tuple)
 	}
+	
 	return ret
 }
 
 func (self *RedisClient) Restart() bool {
 	os.Setenv("AFL_MAP_SIZE",gramfree.AFL_MAP_SIZE)
-	os.Setenv("__AFL_SHM_ID",gramfree.__AFL_SHM_ID)
+	os.Setenv("__AFL_SHM_ID",gramfree.AFL_SHM_ID)
 	program := "/usr/local/redis/src/redis-server"
 	arg1 := "&"
 	cmd := exec.Command(program,arg1)

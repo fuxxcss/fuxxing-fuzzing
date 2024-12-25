@@ -4,6 +4,7 @@ package db
 #cgo LDFLAGS: -L/usr/local/pgsql/lib -lpq
 #include "/usr/include/postgresql/libpq-fe.h"
 */
+/*
 import "C"
 
 import (
@@ -34,7 +35,7 @@ const SelectMetadata = `
 	union
 	select policyname as name,'POLICY' as type,null as parent_name from pg_policies
 	*/
-
+/*
 type PostgresqlClient struct {
 	connstr string
 	status gramfree.DBMStatus
@@ -137,6 +138,7 @@ func (self *PostgresqlClient) Select_metadata() [][3]string {
 		case "POLICY" :
 			tp = "POLICY"
 		*/
+		/*
 		default :
 			tp = ""
 		}
@@ -163,4 +165,4 @@ func (self *PostgresqlClient) Restart() bool {
 	}
 	return true
 }
-
+*/

@@ -74,7 +74,7 @@ func main() {
 	var ret bool
 	/*	get envs	*/
 	dbms = os.Getenv("DBMS")
-	gramfree.__AFL_SHM_ID = os.Getenv("SHM_ID")
+	gramfree.AFL_SHM_ID = os.Getenv("SHM_ID")
 	gramfree.AFL_MAP_SIZE = os.Getenv("AFL_MAP_SIZE")
 	switch dbms {
 	case gramfree.Redis :
