@@ -3,7 +3,7 @@ package db
 // add #define type Type before redisReply
 
 /*
-#cgo LDFLAGS: -L/usr/local/hiredis-1.2.0/ -lredis
+#cgo LDFLAGS: -L/usr/local/hiredis-1.2.0/ -lhiredis
 #include "/usr/local/hiredis-1.2.0/hiredis.h"
 
 redisReply *redisCommand_wrapper(redisContext * rc,const char *format,char *arg){
@@ -11,6 +11,11 @@ redisReply *redisCommand_wrapper(redisContext * rc,const char *format,char *arg)
 	res = redisCommand(rc,format,arg);
 	return res;
 }
+
+char *redisReply_element(redisReply *res,size_t index){
+	return res->element[index]->str;
+}
+
 */
 import "C"
 
@@ -94,10 +99,9 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 	res := C.redisCommand_wrapper(self.conn,Format,keystr)
 	ret := make([][3]string,0)
 	var tuple [3]string
-	var name string
 	num := uint(res.elements)
 	for ; num >= 0 ; num -- {
-		name = res.element[num].str
+		name := C.redisReply_element(res,C.size_t(num))
 		// type
 		var tp string
 		types := C.redisCommand_wrapper(self.conn,TYPE,name).str
@@ -106,13 +110,14 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 			tp = "STR"
 		case "hash" :
 			tp = "HASH"
-			fileds := C.redisCommand_wrapper(self.conn,HKeys,name)
-			fnum := uint(fileds.elements)
+			fields := C.redisCommand_wrapper(self.conn,HKeys,name)
+			fnum := uint(fields.elements)
 			for ; fnum >= 0 ; fnum -- {
+				field_name := C.redisReply_element(fields,C.size_t(fnum))
 				var ftuple [3]string
-				ftuple[0] = fileds.element[fnum].str
+				ftuple[0] = C.GoString(field_name)
 				ftuple[1] = "FIELD"
-				ftuple[2] = name
+				ftuple[2] = C.GoString(name)
 				ret = append(ret,ftuple)
 			}
 		case "list" :
@@ -128,7 +133,7 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 		default :
 			tp = ""
 		}
-		tuple[0] = name
+		tuple[0] = C.GoString(name)
 		tuple[1] = tp
 		// parent_name
 		tuple[2] = ""

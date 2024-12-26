@@ -51,7 +51,7 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 		//fmt.Println("line's metadata:",line)
 		// select metadata to metamap
 		metamap.Update()
-		for _,tuple := range client.Select_metadata() {
+		for _,tuple := range client.Collect_metadata() {
 			// tuple (name,type,parent_name)
 			graph.Build_metamap(tuple[0],tuple[1],tuple[2])
 		}
@@ -79,7 +79,7 @@ func main() {
 	switch dbms {
 	case gramfree.Redis :
 		client = new(db.RedisClient)
-		ret = client.Connect(gramfree.User,gramfree.Passwd,gramfree.DBName)
+		ret = client.Connect(gramfree.Redis_IP,gramfree.Redis_PORT)
 	/*
 	case gramfree.KeyDB :
 		client = new(db.KeyDBClient)
