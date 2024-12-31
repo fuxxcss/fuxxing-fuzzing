@@ -36,6 +36,16 @@ activate redis:
 > AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx src/redis-server &
 ```
 ### keydb
+keydb fuzz required:
+- instrument keydb
+- hiredis too
+instrument keydb-server
+``` shell
+apt install libcurl4-openssl-dev
+cd /usr/local/keydb
+AFL_USE_ASAN=1 CC=afl-clang-lto CXX=afl-clang-lto++ make MALLOC=libc
+```
+
 ``` shell
 export AFL_USE_ASAN=1
 export CC=afl-cc
