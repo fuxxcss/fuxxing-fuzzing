@@ -1,0 +1,50 @@
+SELECT 1
+EXISTS mykey
+APPEND mykey "Hello"
+APPEND mykey " World"
+GET mykey
+APPEND ts "0043"
+APPEND ts "0035"
+GETRANGE ts 0 3
+GETRANGE ts 4 7
+BGREWRITEAOF
+SET mykey "foobar"
+BITCOUNT mykey
+BITCOUNT mykey 0 0
+BITCOUNT mykey 1 1
+BITCOUNT mykey 1 1 BYTE
+BITCOUNT mykey 5 30 BIT
+BGSAVE SCHEDULE
+BITFIELD mykey INCRBY i5 100 1 GET u4 0
+BITFIELD mystring SET i8 #0 100 SET i8 #1 200
+BITFIELD mykey incrby u2 100 1 OVERFLOW SAT incrby u2 102 1
+BITFIELD mykey incrby u2 100 1 OVERFLOW SAT incrby u2 102 1
+BITFIELD mykey incrby u2 100 1 OVERFLOW SAT incrby u2 102 1
+BITFIELD mykey incrby u2 100 1 OVERFLOW SAT incrby u2 102 1
+BITFIELD mykey OVERFLOW FAIL incrby u2 102 1
+BITFIELD_RO hello GET i8 16
+SET key1 "foobar"
+SET key2 "abcdef"
+BITOP AND dest key1 key2
+GET dest
+SET mykey "\xff\xf0\x00"
+BITPOS mykey 0
+SET mykey "\x00\xff\xf0"
+BITPOS mykey 1 0
+BITPOS mykey 1 2
+BITPOS mykey 1 2 -1 BYTE
+BITPOS mykey 1 7 15 BIT
+SET mykey "\x00\x00\x00"
+BITPOS mykey 1
+BITPOS mykey 1 7 -3 BIT
+BLPOP list1 list2 list3 0
+DEL list1 list2
+RPUSH list1 a b c
+BLPOP list1 list2 0
+MULTI
+SYNC
+CLIENT PAUSE 100
+SADD key element
+LPUSH helper_key x
+EXEC
+DEL list1 list2

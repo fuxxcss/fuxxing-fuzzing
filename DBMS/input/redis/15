@@ -1,0 +1,34 @@
+ZADD myzset 1 "one"
+ZRANK myzset "three" WITHSCORE
+ZRANK myzset "four" WITHSCORE
+ZREM myzset "two"
+ZADD myzset 0 aaaa 0 b 0 c 0 d 0 e
+ZADD myzset 0 foo 0 zap 0 zip 0 ALPHA 0 alpha
+ZREMRANGEBYLEX myzset [alpha [omega
+ZRANGE myzset 0 -1
+ZADD myzset 1 "one"
+ZADD myzset 3 "three"
+ZREMRANGEBYRANK myzset 0 1
+ZRANGE myzset 0 -1 WITHSCORES
+ZADD myzset 1 "one"
+ZREMRANGEBYSCORE myzset -inf (2
+ZREVRANGE myzset 0 -1
+ZREVRANGE myzset 2 3
+ZREVRANGE myzset -2 -1
+ZADD myzset 0 a 0 b 0 c 0 d 0 e 0 f 0 g
+ZREVRANGEBYLEX myzset (c -
+ZREVRANGEBYLEX myzset (g [aaa
+ZREVRANGEBYLEX myzset [c -
+ZREVRANGEBYSCORE myzset +inf -inf
+ZREVRANGEBYSCORE myzset 2 (1
+ZREVRANGEBYSCORE myzset (2 (1
+ZREVRANK myzset "four"
+ZREVRANK myzset "three" WITHSCORE
+ZADD myzset 1 "one"
+ZSCORE myzset "one"
+ZADD zset1 1 "one"
+ZUNION 2 zset1 zset2
+ZUNION 2 zset1 zset2 WITHSCORES
+ZADD zset2 2 "two"
+ZUNIONSTORE out 2 zset1 zset2 WEIGHTS 2 3
+ZRANGE out 0 -1 WITHSCORES

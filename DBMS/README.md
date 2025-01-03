@@ -33,9 +33,14 @@ activate redis:
 > AFL_DEBUG=1 /usr/local/redis/src/redis-server # __afl_map_size ssss
 > ^C
 > ipcmk -M ssss -p 0666 #Shared memory id: xxxx
-> AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx src/redis-server &
+> AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx /usr/local/redis/src/redis-server &
+```
+construct initial testcases from
+``` shell
+https://redis.io/docs/latest/commands/
 ```
 ### keydb
+
 keydb fuzz required:
 - instrument keydb
 - hiredis too
@@ -45,15 +50,22 @@ apt install libcurl4-openssl-dev
 cd /usr/local/keydb
 AFL_USE_ASAN=1 CC=afl-clang-lto CXX=afl-clang-lto++ make MALLOC=libc
 ```
+activate redis (maybe need to trash /root/dump.rdb first) : 
+``` shell
+> AFL_DEBUG=1 /usr/local/keydb/src/keydb-server # __afl_map_size ssss
+> ^C
+> ipcmk -M ssss -p 0666 #Shared memory id: xxxx
+> AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx /usr/local/keydb/src/keydb-server &
+```
+keydb is a fork of redis,so we reuse input/redis.
 
+### mongodb
+### agensgraph
 ``` shell
 export AFL_USE_ASAN=1
 export CC=afl-cc
 export CXX=afl-c++
 ```
-### mongodb
-### agensgraph
-
 ## install
 ### go build
 please do thease after dbms init.
@@ -94,6 +106,7 @@ export SHM_ID=xxxx # same as __AFL_SHM_ID
 ```
 into run.sh
 ``` shell
-#select db from (redis,keydb,mongodb,agensgraph)
-DBMS=db ./run.sh 
+./run.sh
+# select * from (redis,keydb,mongodb,agensgraph)
+*
 ```

@@ -27,7 +27,7 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 	graph.Map = metamap
 	line_slice := strings.SplitAfter(testcase,";")
 	for _,line := range line_slice {
-		// sequential execute one line: sql/command
+		// sequential execute one line
 		status = client.Execute(line)
 		// deal with Crash
 		if status == gramfree.Crash || !client.Check_alive() {

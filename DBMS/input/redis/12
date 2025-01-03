@@ -1,0 +1,54 @@
+PSETEX mykey 1000 "Hello"
+PTTL mykey
+SELECT 4
+SET mykey "Hello"
+EXPIRE mykey 1
+PTTL mykey
+RANDOMKEY
+READONLY
+READWRITE
+SET mykey "Hello"
+RENAME mykey myotherkey
+GET myotherkey
+RENAMENX mykey myotherkey
+REPLCONF
+DEL mykey
+RESTORE mykey 0 "\x17\x17\x00\x00\x00\x12\x00\x00\x00\x03\x00\x00\xc0\x01\x00\x04\xc0\x02\x00\x04\xc0\x03\x00\xff\x04\x00u#<\xc0;.\xe9\xdd"
+RANGE mykey 0 -1
+RPUSH mylist "one" "two" "three" "four" "five"
+RPOP mylist
+RPOP mylist 2
+WATCH mylist
+LRANGE mylist 0 -1
+RPOPLPUSH mylist myotherlist
+LRANGE myotherlist 0 -1
+RPUSH mylist "hello"
+RPUSHX mylist "World"
+LRANGE myotherlist 0 -1
+SADD myset "Hello"
+SADD myset "World"
+UNLINK myset mylist
+SMEMBERS myset
+HMSET hash name Jack age 33
+HSCAN hash 0
+HSET myhash a 1 b 2
+HSCAN myhash 0 NOVALUES
+HSCAN myhash 0
+GEOADD geokey 0 0 value
+ZADD zkey 1000 value
+SCAN 0 TYPE zset
+SWAPDB 2 5
+MULTI
+SADD myset "Hello"
+SCARD myset
+SCRIPT KILL
+SCRIPT LOAD "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}"
+EVAL "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}" 2 key1 key2 first second
+SADD key1 "a"
+SADD key2 "e"
+SDIFF key1 key2
+SADD key1 "b"
+SADD key2 "d"
+TOUCH key1 key2
+SDIFFSTORE mykey key1 key2
+SMEMBERS mykey

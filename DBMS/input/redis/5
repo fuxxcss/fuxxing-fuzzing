@@ -1,0 +1,54 @@
+COMMAND COUNT
+COMMAND GETKEYS MSET a b c d e f
+COMMAND GETKEYS EVAL "not consulted" 3 key1 key2 key3 arg1 arg2 arg3 argN
+COMMAND GETKEYS SORT mylist ALPHA STORE outlist
+COMMAND GETKEYSANDFLAGS LMOVE mylist1 mylist2 left left
+config get *max-*-entries* maxmemory
+CONFIG RESETSTAT
+CONFIG REWRITE
+SET dolly "sheep"
+COPY dolly clone
+GET clone
+DBSIZE
+SET mykey "10"
+INCRBY mykey 5
+DECR mykey
+SET mykey "234293482390480948029348230948"
+DECR mykey
+DECRBY mykey 3
+SYNC
+SET key1 "Hello"
+SET key2 "World"
+DEL key1 key2 key3
+DISCARD
+SET mykey 10
+INCR mykey
+WATCH mykey
+DUMP mykey
+EVAL "return ARGV[1]" 0 hello
+SET mykey "Hello"
+EVAL_RO "return redis.call('GET', KEYS[1])" 1 mykey
+EVAL_RO "return redis.call('DEL', KEYS[1])" 1 mykey
+EXEC
+SET key1 "Hello"
+EXISTS key1
+EXISTS nosuchkey
+SET key2 "World"
+EXISTS key1 key2 nosuchkey
+SET mykey "Hello"
+EXPIRE mykey 10
+INCR mykey
+TTL mykey
+SET mykey "Hello World"
+TTL mykey
+EXPIRE mykey 10 XX
+WAIT 1 0
+TTL mykey
+EXPIRE mykey 10 NX
+TTL mykey
+SET mykey "Hello World"
+TTL mykey
+EXPIRE mykey 10 XX
+TTL mykey
+EXPIRE mykey 10 NX
+TTL mykey

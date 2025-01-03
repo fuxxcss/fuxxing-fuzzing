@@ -1,0 +1,53 @@
+LPUSH mylist "one" "two" "three" "four" "five"
+LMPOP 1 mylist LEFT
+LRANGE mylist 0 -1
+LMPOP 1 mylist RIGHT COUNT 10
+LPUSH mylist "one" "two" "three" "four" "five"
+LPUSH mylist2 "a" "b" "c" "d" "e"
+LMPOP 2 mylist mylist2 right count 3
+LRANGE mylist 0 -1
+LMPOP 2 mylist mylist2 right count 5
+LMPOP 2 mylist mylist2 right count 10
+EXISTS mylist mylist2
+RPUSH mylist "one" "two" "three" "four" "five"
+LPOP mylist
+LPOP mylist 2
+LRANGE mylist 0 -1
+SELECT 5
+BGREWRITEAOF
+RPUSH mylist a b c 1 2 3 c c
+LPOS mylist c
+LPOS mylist c RANK 2
+LPOS mylist c RANK -1
+LPOS mylist c COUNT 2
+LPOS mylist c RANK -1 COUNT 2
+LPOS mylist c COUNT 0
+RPUSH mylist a b c d 1 2 3 4 3 3 3
+LPOS mylist 3 COUNT 0 RANK 2
+LPUSH mylist "world"
+LPUSH mylist "hello"
+SAVE
+LRANGE mylist 0 -1
+RPUSHX mylist "World"
+LPUSHX mylist "Hello"
+LPUSHX myotherlist "Hello"
+LRANGE mylist 0 -1
+LRANGE myotherlist 0 -1
+MULTI
+RPUSH mylist "one"
+WATCH mylist
+RPUSH mylist "two"
+SWAPDB 2 3
+LRANGE mylist 0 0
+LRANGE mylist -3 2
+LRANGE mylist -100 100
+LRANGE mylist 5 10
+RPUSH mylist "hello"
+RPUSH mylist "foo"
+LREM mylist -2 "hello"
+EXEC
+LRANGE mylist 0 -1
+LSET mylist 0 "four"
+LRANGE mylist 0 -1
+LTRIM mylist 1 -1
+LRANGE mylist 0 -1

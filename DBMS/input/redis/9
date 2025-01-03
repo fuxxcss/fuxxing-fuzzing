@@ -1,0 +1,50 @@
+SELECT 3
+HSET mykey field1 "hello" field2 "world"
+HTTL mykey FIELDS 3 field1 field2 field3
+INCR mykey
+SET mykey 10.50
+INCRBYFLOAT mykey 0.1
+INCRBYFLOAT mykey -5
+SET mykey 5.0e3
+BGREWRITEAOF
+BGSAVE SCHEDULE
+INCRBYFLOAT mykey 2.0e2
+LASTSAVE
+latency reset command
+debug sleep .1
+SAVE
+debug sleep .3
+debug sleep .5
+latency graph command
+LATENCY HISTOGRAM set
+latency history command
+debug sleep 1
+latency latest
+MSET key1 ohmytext key2 mynewtext
+LCS key1 key2
+LCS key1 key2 IDX
+LCS key1 key2 IDX MINMATCHLEN 4
+LCS key1 key2 IDX MINMATCHLEN 4 WITHMATCHLEN
+LPUSH mylist "World"
+LPUSH mylist "Hello"
+LINDEX mylist 0
+LINDEX mylist -1
+LINDEX mylist 3
+LLEN mylist
+RPUSH mylist "Hello"
+RPUSH mylist "World"
+LINSERT mylist BEFORE "World" "There"
+LRANGE mylist 0 -1
+LLEN mylist
+WAITAOF 0 1 1000
+SELECT 2
+BGREWRITEAOF
+RPUSH mylist "one"
+RPUSH mylist "two"
+RPUSH mylist "three"
+LMOVE mylist myotherlist RIGHT LEFT
+LMOVE mylist myotherlist LEFT RIGHT
+LRANGE mylist 0 -1
+LRANGE myotherlist 0 -1
+RPOPLPUSH mylist myotherlist
+LMPOP 2 non1 non2 LEFT COUNT 10

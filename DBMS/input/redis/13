@@ -1,0 +1,51 @@
+SET anotherkey "will expire in a minute" EX 60
+GET mykey
+EXEC
+SELECT 5
+SETBIT mykey 7 1
+SETBIT mykey 7 0
+GET mykey
+SETBIT bitmapsarestrings 2 1
+SETBIT bitmapsarestrings 10 1
+SETBIT bitmapsarestrings 14 1
+GET bitmapsarestrings
+SETEX mykey 10 "Hello"
+TTL mykey
+GET mykey
+SETNX mykey "Hello"
+GET mykey
+SETRANGE key1 6 "Redis"
+SETRANGE key2 6 "Redis"
+SADD key1 "b"
+SADD key2 "c"
+UNLINK key1 key2
+MULTI
+SINTER key1 key2
+WAITAOF 0 1 1000
+SINTER key1 key2
+SINTERCARD 2 key1 key2
+SADD key1 "c"
+SINTERCARD 2 key1 key2 LIMIT 1
+SINTERSTORE key key1 key2
+SUNION key1 key2
+SMEMBERS key
+SADD myset "one"
+SISMEMBER myset "one"
+SLOWLOG GET 1
+SLOWLOG LEN
+SMEMBERS myset
+SMISMEMBER myset "one" "notamember"
+SMOVE myset myotherset "two"
+SMEMBERS myset
+SORT mylist
+SORT mylist DESC
+SORT mylist ALPHA
+SORT mylist LIMIT 0 10
+SORT mylist LIMIT 0 5 ALPHA DESC
+SADD myset "three"
+SPOP myset
+SMEMBERS myset
+SRANDMEMBER myset
+SRANDMEMBER myset -5
+SRANDMEMBER myset 2
+EXEC

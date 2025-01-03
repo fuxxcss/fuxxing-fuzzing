@@ -1,0 +1,45 @@
+SET key1 "Hello"
+SET key2 "World"
+MGET key1 key2 nonexisting
+MOVE key1 2
+MOVE mykey 4
+WAIT 1 0
+MOVE mylist 3
+MOVE mylist 1
+MOVE mykey 5
+UNWATCH
+MSET key1 "Hello" key2 "World"
+GET key1
+GET key2
+MSETNX key1 "Hello" key2 "there"
+MSETNX key2 "new" key3 "world"
+MGET key1 key2 key3
+SET mykey "Hello"
+EXPIRE mykey 10
+TTL mykey
+PERSIST mykey
+TTL mykey
+PEXPIRE mykey 1500
+PTTL mykey
+PEXPIRE mykey 1000 XX
+PEXPIRE mykey 1000 NX
+PEXPIREAT mykey 1555555555005
+PTTL mykey
+SAVE
+PEXPIREAT mykey 33177117420000
+PEXPIRETIME mykey
+PFADD hll a b c d e f g
+PFCOUNT hll
+PFADD hll foo bar zap
+PFADD hll zap zap zap
+PFADD hll foo bar
+PFCOUNT hll
+PFADD some-other-hll 1 2 3
+PFCOUNT hll some-other-hll
+MULTI
+PFADD hll1 foo bar zap a
+PFADD hll2 a b c foo
+PFMERGE hll3 hll1 hll2
+PFCOUNT hll3
+PFSELFTEST
+EXEC

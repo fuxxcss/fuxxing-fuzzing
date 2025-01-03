@@ -1,0 +1,50 @@
+SELECT 4
+SET runoobkey redis
+DEL runoobkey
+SET runoobkey redis
+GET runoobkey
+HMSET runoobkey name "redis tutorial" description "redis basic commands for caching" likes 20 visitors 23000
+SELECT 1
+MULTI
+HGETALL runoobkey
+LPUSH runoobkey redis
+LPUSH runoobkey mongodb
+LPUSH runoobkey mysql
+WATCH runoobkey
+LRANGE runoobkey 0 10
+SADD runoobkey redis
+SADD runoobkey mysql
+SMEMBERS runoobkey
+EXEC
+ZADD runoobkey 1 redis
+ZADD runoobkey 2 mongodb
+ZRANGE runoobkey 0 10 WITHSCORES
+PFADD runoobkey "redis"
+PFADD runoobkey "mongodb"
+PFCOUNT runoobkey
+MULTI
+SET book-name "Mastering C++ in 21 days"
+GET book-name
+SADD tag "C++" "Programming" "Mastering Series"
+SMEMBERS tag
+EXEC
+SELECT 3
+GEOADD Sicily 13.361389 38.115556 "Palermo" 15.087269 37.502669 "Catania"
+GEODIST Sicily Palermo Catania
+GEORADIUS Sicily 15 37 100 km
+GEORADIUS Sicily 15 37 200 km
+GEOPOS Sicily Palermo Catania NonExisting
+GEODIST Sicily Palermo Catania mi
+XADD mystream * name Sara surname OConnor
+XADD mystream * field1 value1 field2 value2 field3 value3
+XLEN mystream
+SAVE
+XRANGE mystream - +
+XADD mystream * field1 A field2 B field3 C field4 D
+XTRIM mystream MAXLEN 2
+XRANGE mystream - +
+XADD mystream * a 1
+XADD mystream * b 2
+XADD mystream * c 3
+XLEN mystream
+XREAD COUNT 2 STREAMS mystream writers 0-0 0-0

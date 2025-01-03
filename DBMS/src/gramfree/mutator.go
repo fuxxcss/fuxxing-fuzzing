@@ -37,7 +37,8 @@ func (self *Mutator) Calculate_line(lines string,dbms string) int {
         lines_len = strings.Count(lines,";")
     case Redis,KeyDB :
         // commands is sliced by \n
-        lines_len = strings.Count(lines,"\n")
+        lua_len := strings.Count(lines,"#!lua")
+        lines_len = strings.Count(lines,"\n") - lua_len
     }
     return lines_len
 }
@@ -48,16 +49,20 @@ func (self *Mutator) one_line(lines string,index int) string {
     return line
 }
 
-func (self *Mutator) Corpus_add(lines string,len int){
+func (self *Mutator) Corpus_add(lines string,length int){
     self.Corpus = append(self.Corpus,lines)
     self.Corpus_num ++
-    self.Corpus_len = append(self.Corpus_len,len)
+    self.Corpus_len = append(self.Corpus_len,length)
     average := self.Average_len
     if average != 0 {
-        average += len
+        average += length
         self.Average_len = average / 2
     }else {
-        self.Average_len = len
+        self.Average_len = length
+    }
+    // trim Corpus
+    if index := len(self.Corpus) - self.Average_len ; index > 0 {
+        self.Corpus = self.Corpus[index:]
     }
 }
 
@@ -153,9 +158,9 @@ func (self *Mutator) Mutate(arg int,reply *int) error {
             if offset == 0 { offset = corpus_num }
             offset --
 
-        // choose one 
+        // choose from first
         }else {
-            offset = corpus_num - len 
+            offset = 0
         }
         // chosen lines text
         chosen = self.Corpus[offset]
