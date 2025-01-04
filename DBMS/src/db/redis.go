@@ -1,6 +1,6 @@
 package db
 
-// add #define type Type before redisReply
+// add #define type Type before redisReply in hiredis.h
 
 /*
 #cgo LDFLAGS: -L/usr/local/hiredis-1.2.0/ -lhiredis

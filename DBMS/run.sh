@@ -1,6 +1,5 @@
 #!/bin/bash
-echo -n "select db from (redis,keydb,mongodb,agensgraph)"
-echo -e "\n> "
+echo -e "select db from (redis,keydb,mongodb,agensgraph)\ndb:"
 read db
 
 if [ $db == "keydb" ];then

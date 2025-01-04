@@ -69,7 +69,6 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 	return status
 }
 
-
 func main() {
 	var ret bool
 	/*	get envs	*/
@@ -80,11 +79,9 @@ func main() {
 	case gramfree.Redis :
 		client = new(db.RedisClient)
 		ret = client.Connect(gramfree.Redis_IP,gramfree.Redis_PORT)
-	/*
 	case gramfree.KeyDB :
-		client = new(db.KeyDBClient)
-		ret = client.Connect()
-	*/
+		client = new(db.RedisClient)
+		ret = client.Connect(gramfree.Redis_IP,gramfree.KeyDB_PORT)
 	default :
 		panic("please export DBMS")
 	}

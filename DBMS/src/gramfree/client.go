@@ -12,6 +12,8 @@ const (
 	// redis
 	Redis_IP = "127.0.0.1"
 	Redis_PORT = 6379
+	// keydb
+	KeyDB_PORT = 6380
 	// dbms
 	Redis = "redis"
 	KeyDB = "keydb"
