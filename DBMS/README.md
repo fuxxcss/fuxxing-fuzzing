@@ -14,8 +14,8 @@ Target No-SQL DBMS:
 ``` shell
 1. Redis (key-value)
 2. KeyDB (key-value)
-3. MongoDB (JSON Doc)
-4. AgensGraph (Cyper)
+3. Redis Stack (Multi-model)
+4. ArangoDB (Multi-model)
 ```
 
 ## prepare targets
@@ -60,22 +60,27 @@ activate redis (maybe need to trash /root/dump.rdb first) :
 ```
 keydb is a fork of redis,so we reuse input/redis.
 
-### mongodb
-mongodb fuzz required:
-- instrument mongodb
-- mongodb-go-driver
-instrument mongod (maybe you need to fix /usr/lib/python3/dist-packages/ first) :
-``` shell
-> cd /usr/local/mongodb
-> AFL_USE_ASAN=1 buildscripts/scons.py --cc=afl-clang-lto --cxx=afl-clang-lto++ mongod mongo
-```
-
-### agensgraph
+### redis-stack
 ``` shell
 export AFL_USE_ASAN=1
 export CC=afl-cc
 export CXX=afl-c++
 ```
+
+### arangodb
+mongodb fuzz required:
+- instrument mongodb
+- mongodb-go-driver
+instrument mongod (maybe fix all files using integral_c.hpp https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a, and mkswap swapon big swapfile) :
+``` shell
+> cd /usr/local/mongodb
+> python3 -m venv ./venv --prompt mongo
+> source venv/bin/activate
+(mongo) > python3 -m pip install 'poetry==1.5.1'
+(mongo) > python3 -m poetry install --no-root --sync
+(mongo) > AFL_USE_ASAN=1 buildscripts/scons.py MONGO_VERSION=x.x.x CC=afl-clang-lto CXX=afl-clang-lto++ install-mongod -j4 --disable-warnings-as-errors
+```
+
 ## install
 
 ### go build
@@ -121,7 +126,7 @@ export SHM_ID=xxxx # same as __AFL_SHM_ID
 into run.sh
 ``` shell
 > ./run.sh
-select db from (redis,keydb,mongodb,agensgraph)
+select db from (redis,keydb,redis-stack,arangodb)
 db:
 redis
 ```
