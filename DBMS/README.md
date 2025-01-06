@@ -4,18 +4,18 @@
    * [Redis](#redis)
    * [KeyDB](#keydb)
    * [Redis Stack](#redis-stack)
-   * [ArangoDB](#arangodb)
+   * [RedisGraph](#redis-graph)
 * [How to Install ?](#install)
 * [How to Use ?](#fuzz)
 
 ## introduction
-This is a Project fuxxing No-SQL Database Management System.<br>
-Target No-SQL DBMS:
+This is a Project fuxxing No-SQL Database Management System.
+Target Redis-based DBMS:
 ``` shell
 1. Redis (key-value)
 2. KeyDB (key-value)
 3. Redis Stack (Multi-model)
-4. ArangoDB (Multi-model)
+4. RedisGraph (graph)
 ```
 
 ## prepare targets
@@ -24,7 +24,7 @@ Target No-SQL DBMS:
 redis fuzz required:
 - instrument redis
 - hiredis
-instrument redis-server,if you dont have afl-clang-lto,look up here[afl-clang-lto](#afl-clang-lto)
+instrument redis-server,if you dont have afl-clang-lto,look up here [afl-clang-lto](#afl-clang-lto).
 ``` shell
 > cd /usr/local/redis
 > AFL_USE_ASAN=1 CC=afl-clang-lto make
@@ -36,15 +36,12 @@ activate redis (maybe need to trash /root/dump.rdb first) :
 > ipcmk -M ssss -p 0666 #Shared memory id: xxxx
 > AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx /usr/local/redis/src/redis-server &
 ```
-construct initial testcases from
-``` shell
-https://redis.io/docs/latest/commands/
-```
+construct initial testcases from [redis commands](https://redis.io/docs/latest/commands/).
 
 ### keydb
 keydb fuzz required:
 - instrument keydb
-- hiredis too
+- hiredis
 instrument keydb-server
 ``` shell
 > apt install libcurl4-openssl-dev
@@ -61,36 +58,40 @@ activate redis (maybe need to trash /root/dump.rdb first) :
 keydb is a fork of redis,so we reuse input/redis.
 
 ### redis-stack
+redis stack fuzz required:
+- instrument redis
+- hiredis
+- redis-stack-server
+download redis-stack-server from [redis stack server](https://redis.io/downloads/#redis-stack-downloads).
+copy redis-stack-server 、etc and lib into /usr/local/redis/src/.
+add
 ``` shell
-export AFL_USE_ASAN=1
-export CC=afl-cc
-export CXX=afl-c++
+REDIS_DATA_DIR=redis-stack
+echo "Starting redis-stack-server, database path ${REDIS_DATA_DIR}"
+CMD=./redis-server
+CONFFILE=etc/redis-stack.conf
+MODULEDIR=$(realpath .)/lib
+```
+before
+``` shell
+${CMD} \
+${CONFFILE} \
+--dir ${REDIS_DATA_DIR} \
+...
+```
+activate redis stack :
+``` shell
+> mkdir redis-stack
+> chmod +x ./redis-stack-server
+> ./redis-stack-server
 ```
 
-### arangodb
+### redis-graph
 ``` shell
-cd /usr/local/
-git clone -b vx.y.z --depth=1 --recursive https://github.com/arangodb/arangodb.git
-# get pubkey.gpg from https://dl.yarnpkg.com/debian/pubkey.gpg
-# apt-key add pubkey.gpg
-# echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-# apt install yarn
-cmake .. -DCMAKE_C_COMPILER=afl-cc -DCMAKE_CXX_COMPILER=afl-c++ -DUSE_MAINTAINER_MODE=off -DUSE_GOOGLE_TESTS=off -DUSE_JEMALLOC=Off
-AFL_USE_ASAN=1 make -j4
+
 ```
 
-mongodb fuzz required:
-- instrument mongodb
-- mongodb-go-driver
-instrument mongod (maybe fix all files using integral_c.hpp https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a, and mkswap swapon big swapfile) :
-``` shell
-> mongodb
-> python3 -m venv ./venv --prompt mongo
-> source venv/bin/activate
-(mongo) > python3 -m pip install 'poetry==1.5.1'
-(mongo) > python3 -m poetry install --no-root --sync
-(mongo) > AFL_USE_ASAN=1 buildscripts/scons.py MONGO_VERSION=x.x.x CC=afl-clang-lto CXX=afl-clang-lto++ install-mongod -j4 --disable-warnings-as-errors
-```
+
 
 ## install
 
@@ -137,7 +138,7 @@ export SHM_ID=xxxx # same as __AFL_SHM_ID
 into run.sh
 ``` shell
 > ./run.sh
-select db from (redis,keydb,redis-stack,arangodb)
+select db from (redis,keydb,stack,graph)
 db:
 redis
 ```
