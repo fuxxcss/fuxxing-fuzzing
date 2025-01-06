@@ -3,8 +3,8 @@
 * [Prepare DBMS](#prepare-targets)
    * [Redis](#redis)
    * [KeyDB](#keydb)
-   * [MongoDB](#mongodb)
-   * [AgensGraph](#agensgraph)
+   * [Redis Stack](#redis-stack)
+   * [ArangoDB](#arangodb)
 * [How to Install ?](#install)
 * [How to Use ?](#fuzz)
 
@@ -68,12 +68,23 @@ export CXX=afl-c++
 ```
 
 ### arangodb
+``` shell
+cd /usr/local/
+git clone -b vx.y.z --depth=1 --recursive https://github.com/arangodb/arangodb.git
+# get pubkey.gpg from https://dl.yarnpkg.com/debian/pubkey.gpg
+# apt-key add pubkey.gpg
+# echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+# apt install yarn
+cmake .. -DCMAKE_C_COMPILER=afl-cc -DCMAKE_CXX_COMPILER=afl-c++ -DUSE_MAINTAINER_MODE=off -DUSE_GOOGLE_TESTS=off -DUSE_JEMALLOC=Off
+AFL_USE_ASAN=1 make -j4
+```
+
 mongodb fuzz required:
 - instrument mongodb
 - mongodb-go-driver
 instrument mongod (maybe fix all files using integral_c.hpp https://github.com/boostorg/numeric_conversion/commit/50a1eae942effb0a9b90724323ef8f2a67e7984a, and mkswap swapon big swapfile) :
 ``` shell
-> cd /usr/local/mongodb
+> mongodb
 > python3 -m venv ./venv --prompt mongo
 > source venv/bin/activate
 (mongo) > python3 -m pip install 'poetry==1.5.1'
