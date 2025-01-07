@@ -25,10 +25,11 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 	graph := new(gramfree.Graph)
 	metamap := new(gramfree.Metamap)
 	graph.Map = metamap
-	line_slice := strings.SplitAfter(testcase,";")
+	line_slice := strings.SplitAfter(testcase,"\n")
 	for _,line := range line_slice {
-		// sequential execute one line
-		status = client.Execute(line)
+		// sequential execute one line, trim '\n'
+		status = client.Execute(line[:len(line)-1])
+		fmt.Println(line)
 		// deal with Crash
 		if status == gramfree.Crash || !client.Check_alive() {
 			fmt.Println("[*] Crash found ")
@@ -44,11 +45,11 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 		}
 		// deal with Execute error
 		if status == gramfree.ExecError {
+			fmt.Println("here")
 			//trim it
 			testcase = strings.Replace(testcase,line,"",1)
 			continue
 		}
-		//fmt.Println("line's metadata:",line)
 		// select metadata to metamap
 		metamap.Update()
 		for _,tuple := range client.Collect_metadata() {

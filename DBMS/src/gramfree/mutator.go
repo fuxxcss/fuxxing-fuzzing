@@ -32,19 +32,15 @@ func (self *Mutator) Init() {
 func (self *Mutator) Calculate_line(lines string,dbms string) int {
     var lines_len int
     switch dbms {
-    case MongoDB,AgensGraph :
-        // statements is sliced by ; 
-        lines_len = strings.Count(lines,";")
     case Redis,KeyDB :
         // commands is sliced by \n
-        lua_len := strings.Count(lines,"#!lua")
-        lines_len = strings.Count(lines,"\n") - lua_len
+        lines_len = strings.Count(lines,"\n")
     }
     return lines_len
 }
 
 func (self *Mutator) one_line(lines string,index int) string {
-    slices := strings.SplitAfter(lines,";")
+    slices := strings.SplitAfter(lines,"\n")
     line := slices[index]
     return line
 }
@@ -61,8 +57,11 @@ func (self *Mutator) Corpus_add(lines string,length int){
         self.Average_len = length
     }
     // trim Corpus
-    if index := len(self.Corpus) - self.Average_len ; index > 0 {
+    if index := self.Corpus_num - self.Average_len ; index > 0 {
         self.Corpus = self.Corpus[index:]
+        self.Corpus_len = self.Corpus_len[index:]
+        self.Corpus_graph = self.Corpus_graph[index:]
+        self.Corpus_num = self.Corpus_num - index
     }
 }
 

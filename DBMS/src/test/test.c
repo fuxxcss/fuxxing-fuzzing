@@ -9,15 +9,16 @@ redisContext *Connect(){
 	return res;
 }
 
+redisReply *redisCommand_wrapper(redisContext * rc,const char *format,char *arg){
+	redisReply *res;
+	res = redisCommand(rc,format,arg);
+	if(res->type == REDIS_REPLY_ERROR) printf("EXEC EERROR");
+	return res;
+}
+
 // return tuple (name,type,parent_name)
 void Collect_metadata(redisContext *con){
-	char *libstr = "FUNCTION LIST";
-    redisReply *res = redisCommand(con,libstr);
-	size_t num = res->elements;
-	printf("lib num:%d\n",num);
-	printf("func num:%d\n",res->element[0]->element[5]->elements);
-	printf("lib name:%s\n",res->element[0]->element[1]->str);
-	printf("func name:%s\n",res->element[0]->element[5]->element[0]->element[1]->str);
+	redisCommand_wrapper(con,"%s","MULTI\n");
 }
 
 int main(){

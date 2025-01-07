@@ -6,12 +6,14 @@ if [ $db == "keydb" ];then
     path="redis"
 else
     path=$db
-if
+fi
 
 export AFL_MAP_SIZE=2097152
-export SHM_ID=54
+export SHM_ID=65550
 
 #export AFL_DEBUG=1
+export DBMS=$db
+export LD_LIBRARY_PATH=/usr/local/hiredis-1.2.0/
 export AFL_CUSTOM_MUTATOR_ONLY=1
 export AFL_CUSTOM_MUTATOR_LIBRARY=build/libcustom.so
 export AFL_DISABLE_TRIM=1

@@ -208,9 +208,9 @@ func (self *Graph) Build_graph(stmtstr string){
     var reg *regexp.Regexp
     for m_index,meta := range graph_copy.Metas {
         // regular match
-        reg = regexp.MustCompile(meta.V_meta.M_name + "[ |;|,|)]")
+        reg = regexp.MustCompile(meta.V_meta.M_name + "[ |{|']")
         if reg.MatchString(stmtstr) {
-            reg = regexp.MustCompile(meta.V_meta.M_parent + "[ |;|,|)]")
+            reg = regexp.MustCompile(meta.V_meta.M_parent + "[ |{|']")
             // different table can have same column name
             if reg.MatchString(stmtstr) {
                 graph_copy.add_edge(ETYPE_m_to_s,m_index,s_index)
@@ -283,8 +283,8 @@ func (self *Graph) Build_graph(stmtstr string){
     /* do nothing */
     }
     /* Step 4 : update graph */
-    self.Metas=graph_copy.Metas;
-    self.Stmts=graph_copy.Stmts;
+    self.Metas = graph_copy.Metas
+    self.Stmts = graph_copy.Stmts
 }
 
 /* build_metamap before build_graph */

@@ -1,15 +1,19 @@
 package db
 
-// add #define type Type before redisReply in hiredis.h
-
 /*
 #cgo LDFLAGS: -L/usr/local/hiredis-1.2.0/ -lhiredis
 #include "/usr/local/hiredis-1.2.0/hiredis.h"
+#include <stdio.h>
 
 redisReply *redisCommand_wrapper(redisContext * rc,const char *format,char *arg){
 	redisReply *res;
 	res = redisCommand(rc,format,arg);
+	if(res->type == REDIS_REPLY_ERROR) printf("EXEC EERROR");
 	return res;
+}
+
+int redisReply_type(redisReply *res){
+	return res->type;
 }
 
 redisReply *redisReply_element(redisReply *res,size_t index){
@@ -67,20 +71,20 @@ func (self *RedisClient) Reconnect() bool {
 
 func (self *RedisClient) Check_alive() bool {
 	res := C.redisCommand_wrapper(self.conn,Format,Ping)
-	if res == nil || res.Type == C.REDIS_REPLY_ERROR { return false }
+	if res == nil || C.redisReply_type(res) == C.REDIS_REPLY_ERROR { return false }
 	return true
 }
 
 func (self *RedisClient) Clean_up() bool {
 	res := C.redisCommand_wrapper(self.conn,Format,Flushall)
-	if res == nil || res.Type == C.REDIS_REPLY_ERROR { return false }
+	if res == nil || C.redisReply_type(res) == C.REDIS_REPLY_ERROR { return false }
 	return true
 }
 
 func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
 	cstr := C.CString(command)
 	res := C.redisCommand_wrapper(self.conn,Format,cstr)
-	if res.Type == C.REDIS_REPLY_ERROR {
+	if C.redisReply_type(res) == C.REDIS_REPLY_ERROR {
 		// Crash
 		if strings.Contains(C.GoString(res.str),"Server is down") {
 			self.status = gramfree.Crash
@@ -162,7 +166,6 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 		tuple[2] = ""
 		ret = append(ret,tuple)
 	}
-
 	return ret
 }
 
