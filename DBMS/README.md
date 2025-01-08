@@ -3,8 +3,8 @@
 * [Prepare DBMS](#prepare-targets)
    * [Redis](#redis)
    * [KeyDB](#keydb)
+   * [Memcached](#memcached)
    * [Redis Stack](#redis-stack)
-   * [ArangoDB](#arangodb)
 * [How to Install ?](#install)
 * [How to Use ?](#fuzz)
 
@@ -14,8 +14,8 @@ Target No-SQL DBMS:
 ``` shell
 1. Redis (key-value)
 2. KeyDB (key-value)
-3. Redis Stack (Multi-model)
-4. ArangoDB (Graph)
+3. Memcached (key-value)
+4. Redis Stack (Multi-model)
 ```
 
 ## prepare targets
@@ -42,13 +42,13 @@ construct initial testcases from [redis commands](https://redis.io/docs/latest/c
 keydb fuzz required:
 - instrument keydb (disable shared)
 - hiredis
-instrument keydb-server
+instrument keydb-server.
 ``` shell
 > apt install libcurl4-openssl-dev
 > cd /usr/local/keydb
 > AFL_USE_ASAN=1 CC=afl-clang-lto CXX=afl-clang-lto++ make MALLOC=libc -j4
 ```
-activate redis (maybe need to trash /root/dump.rdb first) : 
+activate keydb (maybe need to trash /root/dump.rdb first) : 
 ``` shell
 > AFL_DEBUG=1 /usr/local/keydb/src/keydb-server -- port 6380 # __afl_map_size ssss
 > ^C
@@ -56,6 +56,25 @@ activate redis (maybe need to trash /root/dump.rdb first) :
 > AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx /usr/local/keydb/src/keydb-server --port 6380 &
 ```
 keydb is a fork of redis,so we reuse input/redis.
+
+### memcached
+memcached fuzz required:
+- instrument memcached (disable shared)
+- libmemcached-dev
+instrument memcached.
+``` shell
+> cd /usr/local/memcached
+> ./autogen.sh
+> CC=afl-clang-fast CXX=afl-clang-fast++ ./configure
+> AFL_USE_ASAN=1 make -j4
+```
+activate memcached :
+``` shell
+> AFL_DEBUG=1 /usr/local/memcached/memcached -u root -p 6381 # __afl_map_size ssss
+> ^C
+> ipcmk -M ssss -p 0666 #Shared memory id: xxxx
+> AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx /usr/local/memcached/memcached -d -u root -p 6381
+```
 
 ### redis-stack
 redis stack fuzz required:
@@ -84,23 +103,6 @@ activate redis stack :
 > mkdir redis-stack
 > chmod +x ./redis-stack-server
 > ./redis-stack-server
-```
-
-### arangodb
-arangodb fuzz required:
-- instrument arangodb (disable shared)
-- official go-driver
-instrument arangodb (maybe need to rm -f CMakeCache.txt first) :
-``` shell
-> cd /usr/local/
-> git clone -b vx.y.z --depth=1 --recursive https://github.com/arangodb/arangodb.git
-# get pubkey.gpg from https://dl.yarnpkg.com/debian/pubkey.gpg
-# apt-key add pubkey.gpg
-# echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-# apt install yarn
-> cmake .. -DCMAKE_C_COMPILER=afl-clang-fast -DCMAKE_CXX_COMPILER=afl-clang-fast++ -Wno-dev -DUSE_MAINTAINER_MODE=off -DUSE_GOOGLE_TESTS=off -DUSE_JEMALLOC=Off
-> CC=afl-clang-fast CXX=afl-clang-fast++ AFL_USE_ASAN=1 make -j4
-
 ```
 
 ## install
@@ -153,7 +155,7 @@ export SHM_ID=xxxx # same as __AFL_SHM_ID
 into run.sh
 ``` shell
 > ./run.sh
-select db from (redis,keydb,stack,arango)
+select db from (redis,keydb,memcached,stack)
 db:
 redis
 ```

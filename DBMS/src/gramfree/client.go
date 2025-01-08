@@ -14,11 +14,13 @@ const (
 	Redis_PORT = 6379
 	// keydb
 	KeyDB_PORT = 6380
+	// memcached
+	Memcached_PORT = 6381
 	// dbms
 	Redis = "redis"
 	KeyDB = "keydb"
-	MongoDB = "mongodb"
-	AgensGraph = "agensgraph"
+	Memcached = "memcached"
+	Redis_Stack = "stack"
 )
 
 const (
