@@ -1,6 +1,5 @@
 SET anotherkey "will expire in a minute" EX 60
 GET mykey
-EXEC
 SELECT 5
 SETBIT mykey 7 1
 SETBIT mykey 7 0
@@ -19,7 +18,6 @@ SETRANGE key2 6 "Redis"
 SADD key1 "b"
 SADD key2 "c"
 UNLINK key1 key2
-MULTI
 SINTER key1 key2
 WAITAOF 0 1 1000
 SINTER key1 key2
@@ -48,4 +46,3 @@ SMEMBERS myset
 SRANDMEMBER myset
 SRANDMEMBER myset -5
 SRANDMEMBER myset 2
-EXEC

@@ -33,7 +33,6 @@ LPUSHX mylist "Hello"
 LPUSHX myotherlist "Hello"
 LRANGE mylist 0 -1
 LRANGE myotherlist 0 -1
-MULTI
 RPUSH mylist "one"
 WATCH mylist
 RPUSH mylist "two"
@@ -45,7 +44,6 @@ LRANGE mylist 5 10
 RPUSH mylist "hello"
 RPUSH mylist "foo"
 LREM mylist -2 "hello"
-EXEC
 LRANGE mylist 0 -1
 LSET mylist 0 "four"
 LRANGE mylist 0 -1

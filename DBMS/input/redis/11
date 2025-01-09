@@ -3,7 +3,7 @@ SET key2 "World"
 MGET key1 key2 nonexisting
 MOVE key1 2
 MOVE mykey 4
-WAIT 1 0
+WAIT 1 500
 MOVE mylist 3
 MOVE mylist 1
 MOVE mykey 5
@@ -36,10 +36,8 @@ PFADD hll foo bar
 PFCOUNT hll
 PFADD some-other-hll 1 2 3
 PFCOUNT hll some-other-hll
-MULTI
 PFADD hll1 foo bar zap a
 PFADD hll2 a b c foo
 PFMERGE hll3 hll1 hll2
 PFCOUNT hll3
 PFSELFTEST
-EXEC

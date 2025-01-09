@@ -28,4 +28,4 @@ INPUT_PATH=$INPUT/$path
 OUTPUT=output
 OUTPUT_PATH=$OUTPUT/$db
 
-afl-fuzz -i $INPUT_PATH -o $OUTPUT_PATH -- build/dbms-fuzz
+afl-fuzz -t 5000 -i $INPUT_PATH -o $OUTPUT_PATH -- build/dbms-fuzz

@@ -29,6 +29,7 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 	for _,line := range line_slice {
 		// sequential execute one line, trim '\n'
 		line_len := len(line)
+		if line_len == 0 { continue }
 		if line[line_len-1] == '\n' {
 			status = client.Execute(line[:line_len-1])
 		}else{
@@ -49,9 +50,7 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 		}
 		// deal with Execute error
 		if status == gramfree.ExecError {
-			fmt.Println("here")
-			//trim it
-			testcase = strings.Replace(testcase,line,"",1)
+			graph.Build_graph(line)
 			continue
 		}
 		// select metadata to metamap
@@ -108,15 +107,17 @@ func main() {
 	// range testcas_loop()
 	mutator.Init()
 	buffer := make([]byte,afl.MaxSize) // avoid: out of memory
-	// test
-	var tmp,testcase string
+	
+	var testcase string
+	/*
 	file,err := os.OpenFile("testcase.txt",os.O_CREATE|os.O_WRONLY|os.O_TRUNC,0664)
 	if err != nil { panic("open failed") }
+	*/
 	for {
 		// clean up database
 		ret = client.Clean_up()
 		if !ret { 
-			fmt.Println(tmp)
+			//fmt.Println(tmp)
 			panic("clean up failed") 
 		}
 		// get one testcase
@@ -124,11 +125,12 @@ func main() {
 		if length <= 0 { panic("next testcase failed") }
 		trim := bytes.TrimRight(buffer,"\x00")
 		testcase = string(trim)
-		//test
+		/* test
 		_,err = file.WriteString("\ntestcase\n")
 		_,err = file.WriteString(testcase)
 		if err != nil { panic("write failed") }
-		tmp = testcase
+		*/
+		//tmp = testcase
 		status := testcase_loop(testcase)
 		// answer to afl-fuzz ，let afl-fuzz decide interesting depends on shmmap coverage
 		afl.End_testcase_to_afl(status)

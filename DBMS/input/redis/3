@@ -37,14 +37,11 @@ BITPOS mykey 1 7 15 BIT
 SET mykey "\x00\x00\x00"
 BITPOS mykey 1
 BITPOS mykey 1 7 -3 BIT
-BLPOP list1 list2 list3 0
+BLPOP list1 list2 list3 1
 DEL list1 list2
 RPUSH list1 a b c
 BLPOP list1 list2 0
-MULTI
-SYNC
 CLIENT PAUSE 100
 SADD key element
 LPUSH helper_key x
-EXEC
 DEL list1 list2

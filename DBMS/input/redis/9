@@ -11,14 +11,10 @@ BGSAVE SCHEDULE
 INCRBYFLOAT mykey 2.0e2
 LASTSAVE
 latency reset command
-debug sleep .1
 SAVE
-debug sleep .3
-debug sleep .5
 latency graph command
 LATENCY HISTOGRAM set
 latency history command
-debug sleep 1
 latency latest
 MSET key1 ohmytext key2 mynewtext
 LCS key1 key2
@@ -27,6 +23,7 @@ LCS key1 key2 IDX MINMATCHLEN 4
 LCS key1 key2 IDX MINMATCHLEN 4 WITHMATCHLEN
 LPUSH mylist "World"
 LPUSH mylist "Hello"
+DEL mylist
 LINDEX mylist 0
 LINDEX mylist -1
 LINDEX mylist 3
@@ -42,6 +39,7 @@ BGREWRITEAOF
 RPUSH mylist "one"
 RPUSH mylist "two"
 RPUSH mylist "three"
+RENAME mylist RENAME key1
 LMOVE mylist myotherlist RIGHT LEFT
 LMOVE mylist myotherlist LEFT RIGHT
 LRANGE mylist 0 -1

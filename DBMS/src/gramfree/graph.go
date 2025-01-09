@@ -1,6 +1,7 @@
 package gramfree
 
 import (
+    //"fmt"
     "regexp"
 )
 
@@ -115,6 +116,8 @@ func (self *Metamap) check_situation() (MetaStatus,[]int) {
         for key2,value := range inner {
             /* old_map has but new_map don't */
             if _,contain := self.New_map[key1][key2] ; !contain {
+                //fmt.Println("Old map:",key1+key2,self.Old_map[key1][key2])
+                //fmt.Println("New map:",key1+key2,self.New_map[key1][key2])
                 if status != MSTAT_drop { status = MSTAT_drop }
                 m_index_slice = append(m_index_slice,value)
             }
@@ -206,6 +209,7 @@ func (self *Graph) Build_graph(stmtstr string){
     /* Step 2 :，add edge old_metadate -> stmtstr (ETYPE_m_to_s) */
     s_index := graph_copy.Stmt_num -1
     var reg *regexp.Regexp
+    old_slice := make([]int,0)
     for m_index,meta := range graph_copy.Metas {
         // regular match
         reg = regexp.MustCompile(meta.V_meta.M_name + "[ |{|']")
@@ -214,12 +218,13 @@ func (self *Graph) Build_graph(stmtstr string){
             // different table can have same column name
             if reg.MatchString(stmtstr) {
                 graph_copy.add_edge(ETYPE_m_to_s,m_index,s_index)
+                old_slice = append(old_slice,m_index)
             }
         }
     }
     /* Step 3 : add edge depends on three situation */
     // Metamap
-    Map := *self.Map 
+    Map := *self.Map
     status,m_index_slice := Map.check_situation()
     slice_len := len(m_index_slice)
     hitmap := make([]bool,slice_len)
@@ -256,29 +261,24 @@ func (self *Graph) Build_graph(stmtstr string){
                         break
                     }
                 }
-                if !assert { panic(meta_name) }
+                if !assert { panic("create panic:"+meta_name) }
             }
         }
     case MSTAT_drop :
-        // droped is related to old metadata
+        // droped is related to old metadata,but SELECT 2 is not
+        /*
+        assert := false
         for _,m_index := range m_index_slice {
-            meta_name := graph_copy.Metas[m_index].V_meta.M_name
-            /* assert */
-            assert := false
-            for next1 := graph_copy.Stmts[s_index].V_in ; next1 != nil ; next1 = next1.E_to_next {
-                // for example : drop a_pkey but not has edge a_pkey -> DROP a
-                for next2 := next1.E_from.V_in ; next2 != nil ; next2 = next2.E_to_next {
-                    if next2.E_from.V_type != VTYPE_statement { continue }
-                    for next3 := next2.E_from.V_out ; next3 != nil ; next3 = next3.E_from_next {
-                        if meta_name == next3.E_to.V_meta.M_name {
-                            assert = true
-                            break
-                        }
-                    }
-                }    
+            meta_name :=graph_copy.Metas[m_index].V_meta.M_name
+            for _,old_index := range old_slice{
+                if m_index == old_index {
+                    assert = true
+                    break
+                }
             }
-            if !assert { panic(meta_name) }
+            if !assert { panic("drop panic:"+meta_name) }
         }
+        */
     case MSTAT_keep :
     /* do nothing */
     }
@@ -321,7 +321,9 @@ func (self *Graph) Build_metamap(nm string,tp string,pnm string){
         if meta.V_meta.M_name == nm && meta.V_meta.M_parent == pnm && meta.V_meta.M_type == mtp {
             inner := make(map[string]int)
             inner[pnm] = index
-            self.Map.New_map[nm] = inner
+            // avoid map rewrite
+            self.Map.New_map[nm+pnm] = inner
+            //fmt.Println("Keep New map:",nm+pnm,self.Map.New_map[nm][pnm])
             return
         }
     }
@@ -332,5 +334,6 @@ func (self *Graph) Build_metamap(nm string,tp string,pnm string){
     self.add_vertex_meta(data)
     inner := make(map[string]int)
     inner[pnm] = self.Meta_num -1
-    self.Map.New_map[nm] = inner
+    self.Map.New_map[nm+pnm] = inner
+    //fmt.Println("Set New map:",nm+pnm,self.Map.New_map[nm][pnm])
 }

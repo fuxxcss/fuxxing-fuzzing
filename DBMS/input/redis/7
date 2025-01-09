@@ -27,12 +27,11 @@ HEXPIRE no-key 20 NX FIELDS 2 field1 field2
 HSET mykey field1 "hello" field2 "world"
 HEXPIRE mykey 10 FIELDS 3 field1 field2 field3
 HGETALL mykey
-SYNC
 HSET mykey field1 "hello" field2 "world"
 HEXPIREAT mykey 1715704971 FIELDS 2 field1 field2
 HTTL mykey FIELDS 2 field1 field2
 HSET mykey field1 "hello" field2 "world"
-HEXPIRE mykey 300  FIELDS 2 field1 field2
+HEXPIRE mykey 300 FIELDS 2 field1 field2
 HEXPIRETIME mykey FIELDS 2 field1 field2
 BGREWRITEAOF
 UNWATCH
@@ -43,3 +42,10 @@ HGET myhash field2
 HSET myhash field1 "Hello"
 HSET myhash field2 "World"
 HGETALL myhash
+SET mykey "Hello"
+RENAME mykey myotherkey
+GET myotherkey
+SET mykey "Hello"
+SET myotherkey "World"
+RENAMENX mykey myotherkey
+GET myotherkey

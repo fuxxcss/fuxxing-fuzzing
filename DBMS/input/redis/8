@@ -20,7 +20,6 @@ HSET mykey field1 "hello" field2 "world"
 HEXPIRE mykey 300 FIELDS 2 field1 field2
 HTTL mykey FIELDS 2 field1 field2
 HPERSIST mykey FIELDS 1 field2
-SYNC
 HTTL mykey FIELDS 2 field1 field2
 HPEXPIRE mykey 2000 FIELDS 2 field1 field2
 HGETALL mykey

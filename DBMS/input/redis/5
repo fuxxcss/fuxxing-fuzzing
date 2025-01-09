@@ -16,11 +16,9 @@ DECR mykey
 SET mykey "234293482390480948029348230948"
 DECR mykey
 DECRBY mykey 3
-SYNC
 SET key1 "Hello"
 SET key2 "World"
 DEL key1 key2 key3
-DISCARD
 SET mykey 10
 INCR mykey
 WATCH mykey
@@ -29,7 +27,6 @@ EVAL "return ARGV[1]" 0 hello
 SET mykey "Hello"
 EVAL_RO "return redis.call('GET', KEYS[1])" 1 mykey
 EVAL_RO "return redis.call('DEL', KEYS[1])" 1 mykey
-EXEC
 SET key1 "Hello"
 EXISTS key1
 EXISTS nosuchkey
@@ -42,7 +39,7 @@ TTL mykey
 SET mykey "Hello World"
 TTL mykey
 EXPIRE mykey 10 XX
-WAIT 1 0
+WAIT 1 1
 TTL mykey
 EXPIRE mykey 10 NX
 TTL mykey

@@ -8,13 +8,19 @@ package db
 redisReply *redisCommand_wrapper(redisContext * rc,const char *format,char *arg){
 	redisReply *res;
 	res = redisCommand(rc,format,arg);
+	if(res->type == REDIS_REPLY_ERROR) printf("%s %s: ERROR\n",format,arg);
 	return res;
 }
 
 redisReply *redisCommand_one(redisContext * rc,const char *format){
 	redisReply *res;
 	res = redisCommand(rc,format);
+	if(res->type == REDIS_REPLY_ERROR) printf("%s: ERROR\n",format);
 	return res;
+}
+
+void redisReply_free(redisReply *res){
+	freeReplyObject(res);
 }
 
 int redisReply_type(redisReply *res){
@@ -31,13 +37,12 @@ import "C"
 import (
 	"os"
 	"os/exec"
-	"fmt"
+	//"fmt"
 	"DBMS/gramfree"
 )
 
 // Commands
 var (
-	Format = C.CString("%s")
 	Ping = C.CString("PING")
 	Flushall = C.CString("FLUSHALL")
 	KEYS = C.CString("KEYS *")
@@ -71,27 +76,28 @@ func (self *RedisClient) Reconnect() bool {
 }
 
 func (self *RedisClient) Check_alive() bool {
-	res := C.redisCommand_wrapper(self.conn,Format,Ping)
+	res := C.redisCommand_one(self.conn,Ping)
 	if res == nil || C.redisReply_type(res) == C.REDIS_REPLY_ERROR { return false }
 	return true
 }
 
 func (self *RedisClient) Clean_up() bool {
-	res := C.redisCommand_wrapper(self.conn,Format,Flushall)
+	res := C.redisCommand_one(self.conn,Flushall)
 	if res == nil || C.redisReply_type(res) == C.REDIS_REPLY_ERROR { return false }
 	return true
 }
 
 func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
+	//fmt.Println(command)
 	cstr := C.CString(command)
 	res := C.redisCommand_one(self.conn,cstr)
+	//fmt.Println(C.GoString(res.str))
 	if C.redisReply_type(res) == C.REDIS_REPLY_ERROR {
 		// Crash
 		if !self.Check_alive() {
 			return gramfree.Crash
 		// ExecError
 		}else {
-			fmt.Println(C.GoString(res.str))
 			return gramfree.ExecError
 		}
 	}
@@ -100,7 +106,7 @@ func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
 
 // return tuple (name,type,parent_name)
 func (self *RedisClient) Collect_metadata() [][3]string {
-	res := C.redisCommand_wrapper(self.conn,Format,KEYS)
+	res := C.redisCommand_one(self.conn,KEYS)
 	ret := make([][3]string,0)
 	var tuple,ftuple [3]string
 	index := int(res.elements) -1
@@ -116,7 +122,7 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 		case "hash" :
 			tp = "HASH"
 			fields := C.redisCommand_wrapper(self.conn,HKeys,name)
-			findex := uint(fields.elements) -1
+			findex := int(fields.elements) -1
 			for ; findex >= 0 ; findex -- {
 				fname := C.redisReply_element(fields,C.size_t(findex)).str
 				ftuple[0] = C.GoString(fname)
@@ -143,7 +149,7 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 		tuple[2] = ""
 		ret = append(ret,tuple)
 	}
-	res = C.redisCommand_wrapper(self.conn,Format,LIST)
+	res = C.redisCommand_one(self.conn,LIST)
 	index = int(res.elements) -1
 	// collect libs and funcs
 	for ; index >= 0 ; index -- {

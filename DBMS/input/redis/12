@@ -14,7 +14,7 @@ RENAMENX mykey myotherkey
 REPLCONF
 DEL mykey
 RESTORE mykey 0 "\x17\x17\x00\x00\x00\x12\x00\x00\x00\x03\x00\x00\xc0\x01\x00\x04\xc0\x02\x00\x04\xc0\x03\x00\xff\x04\x00u#<\xc0;.\xe9\xdd"
-RANGE mykey 0 -1
+LRANGE mykey 0 -1
 RPUSH mylist "one" "two" "three" "four" "five"
 RPOP mylist
 RPOP mylist 2
@@ -38,7 +38,6 @@ GEOADD geokey 0 0 value
 ZADD zkey 1000 value
 SCAN 0 TYPE zset
 SWAPDB 2 5
-MULTI
 SADD myset "Hello"
 SCARD myset
 SCRIPT KILL

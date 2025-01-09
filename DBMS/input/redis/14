@@ -15,10 +15,9 @@ SADD key1 "b"
 SUNIONSTORE mykey key1 key2
 SMEMBERS mykey
 SWAPDB 0 1
-SYNC
 TOUCH key1 key2
 SET foo bar
-WAIT 1 0
+WAIT 1 500
 WAITAOF 0 1 1000
 WATCH key1
 XACK mystream mygroup 1526569495631-0
