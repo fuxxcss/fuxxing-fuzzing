@@ -1,5 +1,5 @@
 #!/bin/bash
-echo -e "select db from (redis,keydb,mongodb,agensgraph)\ndb:"
+echo -e "select db from (redis,keydb,memcached,stack)\ndb:"
 read db
 
 if [ $db == "keydb" ];then
@@ -9,7 +9,7 @@ else
 fi
 
 export AFL_MAP_SIZE=2097152
-export SHM_ID=65550
+export SHM_ID=32777
 
 #export AFL_DEBUG=1
 export DBMS=$db

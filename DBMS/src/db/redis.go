@@ -8,7 +8,12 @@ package db
 redisReply *redisCommand_wrapper(redisContext * rc,const char *format,char *arg){
 	redisReply *res;
 	res = redisCommand(rc,format,arg);
-	if(res->type == REDIS_REPLY_ERROR) printf("EXEC EERROR");
+	return res;
+}
+
+redisReply *redisCommand_one(redisContext * rc,const char *format){
+	redisReply *res;
+	res = redisCommand(rc,format);
 	return res;
 }
 
@@ -26,8 +31,7 @@ import "C"
 import (
 	"os"
 	"os/exec"
-	//"fmt"
-	"strings"
+	"fmt"
 	"DBMS/gramfree"
 )
 
@@ -45,7 +49,6 @@ var (
 type RedisClient struct {
 	conn_ip string
 	conn_port int
-	status gramfree.DBMStatus
 	conn *C.redisContext
 }
 
@@ -53,7 +56,6 @@ func (self *RedisClient) Connect(ip string,port int) bool {
 	// cgo string -> char*
 	conn := C.redisConnect(C.CString(ip),C.int(port))
 	if conn == nil || conn.err != 0 {
-		self.status = gramfree.ConnectError
 		return false
 	}
 	self.conn = conn
@@ -63,7 +65,6 @@ func (self *RedisClient) Connect(ip string,port int) bool {
 func (self *RedisClient) Reconnect() bool {
 	ret := C.redisReconnect(self.conn)
 	if ret == C.REDIS_ERR {
-		self.status = gramfree.ConnectError
 		return false
 	}
 	return true
@@ -83,19 +84,17 @@ func (self *RedisClient) Clean_up() bool {
 
 func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
 	cstr := C.CString(command)
-	res := C.redisCommand_wrapper(self.conn,Format,cstr)
+	res := C.redisCommand_one(self.conn,cstr)
 	if C.redisReply_type(res) == C.REDIS_REPLY_ERROR {
 		// Crash
-		if strings.Contains(C.GoString(res.str),"Server is down") {
-			self.status = gramfree.Crash
+		if !self.Check_alive() {
 			return gramfree.Crash
 		// ExecError
 		}else {
-			self.status = gramfree.ExecError
+			fmt.Println(C.GoString(res.str))
 			return gramfree.ExecError
 		}
 	}
-	self.status = gramfree.Normal
 	return gramfree.Normal
 }
 
@@ -104,7 +103,7 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 	res := C.redisCommand_wrapper(self.conn,Format,KEYS)
 	ret := make([][3]string,0)
 	var tuple,ftuple [3]string
-	index := uint(res.elements) -1
+	index := int(res.elements) -1
 	// collect all types 
 	for ; index >= 0 ; index -- {
 		name := C.redisReply_element(res,C.size_t(index)).str
@@ -145,7 +144,7 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 		ret = append(ret,tuple)
 	}
 	res = C.redisCommand_wrapper(self.conn,Format,LIST)
-	index = uint(res.elements) -1
+	index = int(res.elements) -1
 	// collect libs and funcs
 	for ; index >= 0 ; index -- {
 		lib := C.redisReply_element(res,C.size_t(index))

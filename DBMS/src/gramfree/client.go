@@ -27,13 +27,10 @@ const (
 	Crash DBMStatus = iota
 	// execute error，maybe syntax or semantic error
 	ExecError
-	// connect error
-	ConnectError
 	Normal
 )
 
 type Client interface {
-	// user passwd database
 	Connect(string,int) bool
 	Reconnect() bool
 	Check_alive() bool

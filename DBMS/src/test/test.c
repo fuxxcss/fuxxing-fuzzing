@@ -16,9 +16,21 @@ redisReply *redisCommand_wrapper(redisContext * rc,const char *format,char *arg)
 	return res;
 }
 
+redisReply *redisCommand_oneline(redisContext * rc,const char *command){
+	redisReply *res;
+	res = redisCommand(rc,command);
+	if(res->type == REDIS_REPLY_ERROR) printf("EXEC EERROR");
+	return res;
+}
+
 // return tuple (name,type,parent_name)
 void Collect_metadata(redisContext *con){
-	redisCommand_wrapper(con,"%s","MULTI\n");
+	redisReply *res;
+	redisCommand_oneline(con,"MULTI");
+	redisCommand_oneline(con,"ZADD myzset 1 \"one\"");
+	res = redisCommand_oneline(con,"EXEC");
+	printf("%d",res->integer);
+	redisCommand_wrapper(con,"TYPE %s","myzset");
 }
 
 int main(){

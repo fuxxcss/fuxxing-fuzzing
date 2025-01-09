@@ -20,7 +20,7 @@ var (
 )
 
 func testcase_loop(testcase string) gramfree.DBMStatus {
-	status := gramfree.Normal
+	var status gramfree.DBMStatus
 	// execute new testcase
 	graph := new(gramfree.Graph)
 	metamap := new(gramfree.Metamap)
@@ -28,10 +28,14 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 	line_slice := strings.SplitAfter(testcase,"\n")
 	for _,line := range line_slice {
 		// sequential execute one line, trim '\n'
-		status = client.Execute(line[:len(line)-1])
-		fmt.Println(line)
+		line_len := len(line)
+		if line[line_len-1] == '\n' {
+			status = client.Execute(line[:line_len-1])
+		}else{
+			status = client.Execute(line)
+		}
 		// deal with Crash
-		if status == gramfree.Crash || !client.Check_alive() {
+		if status == gramfree.Crash {
 			fmt.Println("[*] Crash found ")
 			file,err := os.OpenFile("crash.txt",os.O_CREATE|os.O_WRONLY|os.O_TRUNC,0664)
 			if err != nil { panic("open failed") }
@@ -113,7 +117,8 @@ func main() {
 		ret = client.Clean_up()
 		if !ret { 
 			fmt.Println(tmp)
-			panic("clean up failed") }
+			panic("clean up failed") 
+		}
 		// get one testcase
 		length := afl.Next_testcase_from_afl(&buffer[0])
 		if length <= 0 { panic("next testcase failed") }
