@@ -1,0 +1,459 @@
+SET mykey 5.0e3
+HSET myhash f1 HelloWorld f2 99 f3 -256
+GEOSEARCHSTORE key2 Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC COUNT 3 STOREDIST
+EXPIRETIME mykey
+XRANGE writers - + COUNT 2
+XADD mystream * c 3
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream >
+SET runoobkey redis
+ZREVRANGEBYSCORE myzset +inf -inf
+XADD mystream 1 myfield mydata
+SMOVE myset myotherset "two"
+RPOPLPUSH mylist myotherlist
+MGET key1 key2 key3
+LPOS mylist c COUNT 2
+ZRANDMEMBER dadi -5 WITHSCORES
+SAVE
+GET nonexisting
+GETRANGE mykey 0 3
+GEOADD Sicily 13.361389 38.115556 "Palermo" 15.087269 37.502669 "Catania"
+EXISTS key1 key2 nosuchkey
+CLUSTER FAILOVER FORCE
+GET dest
+XADD mystream * b 2
+ZREVRANGEBYSCORE myzset (2 (1
+XREADGROUP GROUP group55 consumer-123 COUNT 1 STREAMS mystream >
+SINTERCARD 2 key1 key2
+HSCAN myhash 0 NOVALUES
+GET key2
+SWAPDB 2 3
+ZADD myzset 2 "two"
+DEL mylist
+HSET myhash field1 "Hello"
+SETBIT mykey 7 1
+GEOPOS Sicily Palermo Catania NonExisting
+XTRIM mystream MAXLEN 1000
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream >
+GET mykey
+SAVE
+ZREVRANGEBYLEX myzset (c -
+WAIT 1 500
+SORT mylist ALPHA
+SCARD myset
+PFADD hll a b c d e f g
+LPOS mylist c
+EXISTS myzset myzset2
+LCS key1 key2 IDX MINMATCHLEN 4 WITHMATCHLEN
+HEXPIRE mykey 300 FIELDS 2 field1 field3
+GETRANGE mykey 10 100
+GEOADD Sicily 13.361389 38.115556 "Palermo" 15.087269 37.502669 "Catania"
+XLEN writers
+XRANGE mystream - +
+XTRIM mystream MINID 649085820
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream >
+ZUNION 2 zset1 zset2
+XADD mystream * b 2
+ZRANGEBYSCORE myzset -inf +inf
+REPLCONF
+PFADD some-other-hll 1 2 3
+LPUSH mylist "hello"
+ZRANGEBYLEX myzset [aaa (g
+LMOVE mylist myotherlist RIGHT LEFT
+HSTRLEN myhash f3
+GETDEL mykey
+GEOSEARCHSTORE key2 Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC COUNT 3 STOREDIST
+CONFIG REWRITE
+CLIENT NO-EVICT ON
+GETRANGE ts 4 7
+XTRIM mystream MAXLEN 2
+XRANGE somestream - +
+SUNIONSTORE mykey key1 key2
+ZRANGEBYLEX myzset - (c
+HSCAN myhash 0
+LRANGE mylist -3 2
+LRANGE mylist 0 -1
+ZMPOP 2 myzset myzset2 MIN COUNT 10
+HRANDFIELD coin
+SETBIT mykey 7 1
+EXPIREAT mykey 33177117420
+DECRBY mykey 3
+CLIENT NO-TOUCH ON
+CLIENT PAUSE 100
+GEORADIUS Sicily 15 37 200 km
+ZADD zset2 2 "two"
+XDEL mystream 1538561700640-0
+SMEMBERS myset
+SCAN 0 TYPE zset
+RPUSH mylist "two"
+ZRANGESTORE dstzset srczset 2 -1
+ZPOPMIN myzset
+ZREVRANGEBYSCORE myzset +inf -inf
+GEOSEARCHSTORE key1 Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC COUNT 3
+HKEYS myhash
+GETEX mykey EX 60
+GEODIST Sicily Palermo Catania mi
+SET mykey "234293482390480948029348230948"
+CLUSTER RESET SOFT
+BITFIELD mykey incrby u2 100 1 OVERFLOW SAT incrby u2 102 1
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream >
+XRANGE writers - + COUNT 2
+SUNION key1 key2
+SORT mylist LIMIT 0 5 ALPHA DESC
+HSCAN myhash 0 NOVALUES
+MSETNX key2 "new" key3 "world"
+ZRANGEBYLEX myzset [aaa (g
+ZMPOP 1 notsuchkey MIN
+GETBIT mykey 0
+LCS key1 key2
+HSET mykey field1 "hello" field2 "world"
+HEXPIRE mykey 300 FIELDS 2 field1 field2
+FUNCTION DELETE mylib
+XRANGE writers - + COUNT 2
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream >
+BITPOS mykey 1 7 -3 BIT
+LPUSH runoobkey mongodb
+ZADD zset1 1 "one"
+XADD writers * name Agatha surname Christie
+GET mykey
+ZRANGESTORE dstzset srczset 2 -1
+WAIT 1 500
+LPOS mylist c COUNT 0
+ZLEXCOUNT myzset - +
+MGET key1 key2 key3
+HGETALL myhash
+HEXPIRE mykey 300 FIELDS 2 field1 field2
+HSET myhash field1 "foo"
+FCALL myfunc 0 hello
+INCR mykey
+CLIENT CACHING YES
+XADD mystream * a 1
+XADD writers * name Toni surname Morrison
+XADD mystream 1 myfield mydata
+SUNIONSTORE mykey key1 key2
+SETEX mykey 10 "Hello"
+GEOADD geokey 0 0 value
+LREM mylist -2 "hello"
+LRANGE mylist 0 -1
+ZMPOP 1 notsuchkey MIN
+SORT mylist ALPHA
+latency graph command
+HGET myhash field1
+GEORADIUS Sicily 15 37 200 km WITHDIST WITHCOORD
+SET mykey "Hello"
+WATCH mykey
+CLIENT NO-TOUCH OFF
+SET mykey "foobar"
+SADD tag "C++" "Programming" "Mastering Series"
+XTRIM mystream MAXLEN 1000
+XGROUP CREATE mystream mygroup 0
+ZRANGEBYSCORE myzset -inf +inf
+SADD myset "World"
+MGET key1 key2 nonexisting
+LPOS mylist c RANK -1
+ZCOUNT myzset (1 3
+GET nonexisting
+GETBIT mykey 100
+EXPIRE mykey 10 XX
+CLUSTER KEYSLOT bar{hash_tag}
+BITFIELD_RO hello GET i8 16
+XADD mystream * c 3
+XPENDING mystream group55
+XREAD COUNT 2 STREAMS mystream writers 1526999352406-0 1526985685298-0
+SMEMBERS key
+SADD key2 "d"
+TTL mykey
+RPUSH mylist "foo"
+ZINTER 2 zset1 zset2
+XRANGE writers - + COUNT 2
+ZRANGEBYLEX myzset - (c
+LRANGE myotherlist 0 -1
+HSET myhash field1 "Hello"
+GET mykey
+WAIT 1 500
+GET clone
+XADD writers * name Agatha surname Christie
+BITPOS mykey 1 7 15 BIT
+SADD runoobkey mysql
+ZREMRANGEBYRANK myzset 0 1
+XRANGE somestream - +
+GET mykey
+HSCAN myhash 0 NOVALUES
+ZRANGESTORE dstzset srczset 2 -1
+LRANGE mylist 0 -1
+ZMPOP 1 myzset MAX COUNT 10
+LREM mylist -2 "hello"
+XADD mystream * c 3
+LRANGE mylist 0 -1
+HPERSIST mykey FIELDS 1 field2
+SET mykey "Hello"
+GEODIST Sicily Palermo Catania
+COMMAND GETKEYS EVAL "not consulted" 3 key1 key2 key3 arg1 arg2 arg3 argN
+CLUSTER FLUSHSLOTS
+BGSAVE SCHEDULE
+ZRANGE runoobkey 0 10 WITHSCORES
+XPENDING mystream group55 - + 10
+XAUTOCLAIM mystream mygroup Alice 3600000 0-0 COUNT 25
+SINTERCARD 2 key1 key2 LIMIT 1
+RENAMENX mykey myotherkey
+TTL mykey
+LREM mylist -2 "hello"
+ZMPOP 1 notsuchkey MIN
+HGETALL myhash
+XADD mystream * b 2
+LPUSH mylist "World"
+HKEYS myhash
+HEXPIRE no-key 20 NX FIELDS 2 field1 field2
+GEODIST Sicily Palermo Catania km
+XADD writers * name Ngozi surname Adichie
+CLUSTER ADDSLOTS 1 2 3 4 5
+BITOP AND dest key1 key2
+XADD mystream * field1 A field2 B field3 C field4 D
+ZRANK myzset "four" WITHSCORE
+XAUTOCLAIM mystream mygroup Alice 3600000 0-0 COUNT 25
+SETBIT bitmapsarestrings 2 1
+RANDOMKEY
+ZADD srczset 1 "one" 2 "two" 3 "three" 4 "four"
+LSET mylist 0 "four"
+ZRANGEBYLEX myzset [aaa (g
+XTRIM mystream MAXLEN 1000
+XTRIM mystream MINID 649085820
+LMOVE mylist myotherlist RIGHT LEFT
+HSET mykey field1 "hello" field2 "world"
+GEOADD Sicily 13.583333 37.316667 "Agrigento"
+GEOHASH Sicily Palermo Catania
+SET mykey "234293482390480948029348230948"
+CLIENT NO-EVICT ON
+BITFIELD mykey incrby u2 100 1 OVERFLOW SAT incrby u2 102 1
+XREAD COUNT 2 STREAMS mystream writers 1526999352406-0 1526985685298-0
+ZREVRANK myzset "three" WITHSCORE
+WAITAOF 0 1 1000
+SELECT 5
+RPOPLPUSH mylist myotherlist
+ZRANGEBYSCORE myzset -inf +inf
+LMPOP 2 mylist mylist2 right count 5
+ZCARD myzset
+XRANGE writers - + COUNT 2
+GET key2
+WAIT 1 500
+HSET myhash field2 "Hi" field3 "World"
+GETRANGE mykey 10 100
+EXISTS mykey
+XTRIM mystream MAXLEN 2
+XADD mystream * field1 A field2 B field3 C field4 D
+BITCOUNT mykey 0 0
+WATCH runoobkey
+XPENDING mystream group55
+XREAD COUNT 2 STREAMS mystream writers 1526999352406-0 1526985685298-0
+SELECT 5
+UNLINK myset mylist
+LPUSHX myotherlist "Hello"
+RPUSHX mylist "World"
+ZADD zset1 3 "three"
+SETBIT mykey 7 1
+XTRIM mystream MINID 649085820
+SELECT 2
+HSET myhash field2 "World"
+GETRANGE mykey 0 3
+EXPIREAT mykey 1293840000
+INCRBY mykey 5
+CLUSTER ADDSLOTSRANGE 1 5
+BGREWRITEAOF
+LPUSH runoobkey redis
+ZREVRANK myzset "three" WITHSCORE
+GETRANGE mykey 10 100
+SETEX mykey 10 "Hello"
+GEOADD geokey 0 0 value
+RPUSH mylist "two"
+LSET mylist 0 "four"
+ZADD myzset 1 "one" 2 "two" 3 "three"
+DECRBY mykey 3
+CLUSTER SLOTS7 -3 BIT
+XADD mystream * a 1
+XADD writers * name Ngozi surname Adichie
+ZADD zset2 2 "two"
+XRANGE mystream - +
+GET bitmapsarestrings
+SELECT 4
+PFADD hll foo bar
+LPOS mylist c RANK -1 COUNT 2
+ZMPOP 1 myzset MIN
+XADD mystream * c 3
+CLIENT PAUSE 100
+XRANGE somestream - +
+HSET myhash f1 HelloWorld f2 99 f3 -256
+HINCRBYFLOAT mykey field 2.0e2
+GET myotherkey
+FCALL my_hset 0 myhash nope nope
+XTRIM mystream MINID 649085820
+DEL list1 list22
+SET key1 "foobar"
+LPUSH runoobkey redis
+XRANGE mystream 1526984818136-0 1526984818136-0
+SELECT 0
+SLOWLOG LEN
+UNLINK myset mylist
+LPUSHX myotherlist "Hello"
+RPUSH mylist "two"
+ZPOPMAX myzset
+LRANGE mylist -3 2
+XRANGE writers - + COUNT 2
+LPOS mylist c COUNT 2
+SETBIT mykey 7 1
+HSTRLEN myhash f3
+TTL mykey
+GEOSEARCHSTORE key2 Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC COUNT 3 STOREDIST
+INCR mykey
+CLUSTER FAILOVER FORCE
+GET dest
+XREAD COUNT 2 STREAMS mystream writers 0-0 0-0
+XADD writers * name Agatha surname Christie
+SELECT 0
+SORT mylist
+RANDOMKEY
+TTL mykey
+LPOS mylist c
+ZINTERCARD 2 zset1 zset2 LIMIT 1
+XADD mystream 1 myfield mydata
+ZCOUNT myzset (1 3
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream >
+GETBIT mykey 100
+HSET myhash field2 "World"
+GEOADD Sicily 13.361389 38.115556 "Palermo" 15.087269 37.502669 "Catania"
+GEODIST Sicily Palermo Catania
+CONFIG RESETSTAT
+SELECT 2
+BITPOS mykey 1
+SAVE
+ZADD myzset 3 "three"
+XCLAIM mystream mygroup Alice 3600000 1526569498055-0
+SISMEMBER myset "one"
+READONLY
+RPUSH mylist "hello"
+LPOS mylist c RANK -1
+ZADD myzset 2 "two" 3 "three"
+GETRANGE mykey 0 3
+HSCAN myhash 0 NOVALUES
+HEXPIRE mykey 300 FIELDS 2 field1 field3
+LINDEX mylist 3
+HPEXPIRETIME mykey FIELDS 2 field1 field2
+WAIT 1 500
+GEOADD Sicily 13.361389 38.115556 "Palermo" 15.087269 37.502669 "Catania"
+SADD key element
+CLUSTER RESET SOFT
+SADD key element
+XREVRANGE mystream + - COUNT 1
+XLEN writers
+XAUTOCLAIM mystream mygroup Alice 3600000 0-0 COUNT 25
+SINTER key1 key2
+RPOPLPUSH mylist myotherlist
+PFADD some-other-hll 1 2 3
+ZRANGEBYSCORE myzset -inf +inf
+ZMPOP 2 myzset myzset2 MIN COUNT 10
+XRANGE writers - + COUNT 2
+HSCAN myhash 0 NOVALUES
+EXPIRETIME mykey
+HSTRLEN myhash f2
+UNWATCH
+INCR mycounter
+GEOSEARCHSTORE key2 Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC COUNT 3 STOREDIST
+COMMAND GETKEYS EVAL "not consulted" 3 key1 key2 key3 arg1 arg2 arg3 argN
+CLUSTER DELSLOTS 1 2 3 4 5
+APPEND mykey "Hello"
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream 0
+XADD somestream * a 1
+SWAPDB 0 1
+GET mykey
+SET mykey "Hello"
+PFADD hll2 a b c foo
+LPOP mylist 2
+ZADD myzset 2 "two" 3 "three"
+XGROUP CREATE mystream mygroup 0
+WATCH mykey
+SET runoobkey redis
+HSTRLEN myhash f2
+GEOSEARCHSTORE key1 Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC COUNT 3
+GEORADIUS Sicily 15 37 200 km WITHCOORD
+EXISTS mykey
+TTL mykey
+ZADD zset1 0 a 1 b 2 c
+DEL list1 list22
+SADD runoobkey mysql
+XADD writers * name Virginia surname Woolf
+WAITAOF 0 1 1000
+SRANDMEMBER myset 2],ARGV[1],ARGV[2]}"
+SWAPDB 2 5
+RPUSH mylist "two"
+SAVE
+ZRANGEBYLEX myzset - (c
+GETDEL mykey
+XADD mystream * a 1
+ZRANGEBYLEX myzset [aaa (g
+HSET myhash field2 "Hi" field3 "World"
+HGET myhash field
+ZRANGE key2 0 -1 WITHSCORES
+GEOSEARCH key1 FROMLONLAT 15 37 BYBOX 400 400 km ASC WITHCOORD WITHDIST WITHHASH
+SET mykey "Hello"
+CLIENT CACHING YES
+BITPOS mykey 1 7 -3 BIT
+XLEN mystream
+XRANGE somestream - +
+XADD mystream * item 3
+ZRANGEBYSCORE myzset 1 2
+READWRITE
+PFADD some-other-hll 1 2 3
+LPOS mylist c COUNT 0
+ZADD myzset 1 "one" 2 "two" 3 "three"
+WATCH mykey
+MGET key1 key2 nonexisting
+ZRANDMEMBER dadi -5 WITHSCORES
+HGET myhash field
+HGETALL mykey
+SET mykey "This is a string"
+GEOSEARCH key1 FROMLONLAT 15 37 BYBOX 400 400 km ASC WITHCOORD WITHDIST WITHHASH
+XREAD COUNT 2 STREAMS mystream writers 0-0 0-01 + COUNT 2
+CLIENT UNPAUSE
+BITPOS mykey 0
+XREAD COUNT 2 STREAMS mystream writers 0-0 0-0
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream >
+XADD mystream * name Sara surname OConnor
+SADD key2 "d"
+PTTL mykey
+ZADD myzset 2 "two"
+LPOS mylist 3 COUNT 0 RANK 2
+ZADD myzset2 4 "four" 5 "five" 6 "six"
+WAIT 1 500
+PFADD hll a b c d e f g
+SETBIT mykey 7 1
+HSTRLEN myhash f2
+HKEYS myhash
+GETDEL mykey
+WAIT 1 500
+XRANGE writers - + COUNT 2
+LPUSH helper_key x
+BITFIELD mykey incrby u2 100 1 OVERFLOW SAT incrby u2 102 1
+HMSET runoobkey name "redis tutorial" description "redis basic commands for caching" likes 20 visitors 23000
+XRANGE somestream - +
+SADD key1 "a"
+SMEMBERS myset
+READONLY
+LREM mylist -2 "hello"
+BGREWRITEAOF
+EXISTS myzset myzset2
+GET clone
+SUNIONSTORE mykey key1 key2
+HSCAN myhash 0 NOVALUES
+LLEN mylist
+HSET mykey field1 "hello" field2 "world"
+GETBIT mykey 0
+GEOPOS Sicily Palermo Catania NonExisting
+INCRBY mykey 5
+BLPOP list1 list2 list3 1
+XADD mystream * b 2
+XTRIM mystream MAXLEN 1000
+ZREVRANGEBYLEX myzset [c -
+XREADGROUP GROUP mygroup myconsumer STREAMS mystream >
+GET mykey
+SADD key2 "d"
+EXPIRE mykey 10
+LPOS mylist c RANK -1
+ZADD zset1 3 "three"

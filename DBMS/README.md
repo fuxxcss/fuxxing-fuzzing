@@ -25,9 +25,10 @@ redis fuzz required:
 - instrument redis (disable shared)
 - hiredis
 instrument redis-server,if you dont have afl-clang-lto,look up here [afl-clang-lto](#afl-clang-lto).
+because jemalloc/tcmalloc have collision with ASAN, so 'MALLOC=libc' is needed.
 ``` shell
 > cd /usr/local/redis
-> AFL_USE_ASAN=1 CC=afl-clang-lto make -j4
+> AFL_USE_ASAN=1 CC=afl-clang-lto make MALLOC=libc -j4
 ```
 activate redis (maybe need to trash /root/dump.rdb first) : 
 ``` shell
@@ -60,7 +61,7 @@ keydb is a fork of redis,so we reuse input/redis.
 ### memcached
 memcached fuzz required:
 - instrument memcached (disable shared)
-- libmemcached-dev
+- 
 instrument memcached.
 ``` shell
 > cd /usr/local/memcached
@@ -133,7 +134,6 @@ if (shm->cmplog_mode) {
     ...
 }
 ```
-
 #### afl-clang-lto
 in order to use afl-clang-lto, for example, your llvm version is 16 and lld-16 was installed.
 ``` shell
