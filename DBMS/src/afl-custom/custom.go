@@ -68,13 +68,14 @@ add_buf *uint8,add_buf_size int,max_size int) int {
     if err != nil { panic("Mutate,rpc error") }
     err = cli.Call("Mutator.Ret_testcase",0,&testcase)
     if err != nil { panic("Ret_testcase,rpc error") }
-    //test
+    // test
     file,err := os.OpenFile("mutated.txt",os.O_CREATE|os.O_WRONLY|os.O_APPEND,0664)
 	if err != nil { panic("open failed") }
     _,err = file.WriteString("\nmutated\n")
     if err != nil { panic("write failed") }
     _,err = file.WriteString(testcase)
 	if err != nil { panic("write failed") }
+    
     *out_buf = (*C.uint8_t)(unsafe.Pointer(C.CString(testcase)))
     return testcase_len
 }

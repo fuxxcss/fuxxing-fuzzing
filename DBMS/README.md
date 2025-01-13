@@ -7,6 +7,7 @@
    * [Redis Stack](#redis-stack)
 * [How to Install ?](#install)
 * [How to Use ?](#fuzz)
+* [ToDo](#todo)
 
 ## introduction
 This is a Project fuxxing No-SQL Database Management System.
@@ -86,11 +87,11 @@ download redis-stack-server from [redis stack server](https://redis.io/downloads
 copy redis-stack-server 、etc and lib into /usr/local/redis/src/.
 add
 ``` shell
-REDIS_DATA_DIR=redis-stack
+REDIS_DATA_DIR=/usr/local/redis/src/redis-stack
 echo "Starting redis-stack-server, database path ${REDIS_DATA_DIR}"
-CMD=./redis-server
-CONFFILE=etc/redis-stack.conf
-MODULEDIR=$(realpath .)/lib
+CMD=/usr/local/redis/src/redis-server
+CONFFILE=/usr/local/redis/src/etc/redis-stack.conf
+MODULEDIR=/usr/local/redis/src/lib
 ```
 before
 ``` shell
@@ -159,3 +160,16 @@ select db from (redis,keydb,memcached,stack)
 db:
 redis
 ```
+
+## ToDo
+1. fix testcase length bug.
+2. learn from Redis CVEs.
+``` shell
+// ?
+[CVE-2024-46981] Lua Use-After-Free RCE
+// use afl mutator to mutate integer argument、identifier
+[CVE-2024-51737] RediSearch – Integer Overflow with LIMIT or KNN Arguments Lead to RCE
+[CVE-2024-51480] RedisTimeSeries –  Integer Overflow RCE
+[CVE-2024-55656] RedisBloom –  Integer Overflow RCE
+```
+
