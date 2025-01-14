@@ -1,0 +1,16 @@
+set runoob 0 900 9
+memcached
+get runoob
+VALUE runoob 0 9
+add new_key 0 900 10
+data_value
+get new_key
+VALUE new_key 0 10
+add mykey 0 900 10
+data_value
+get mykey
+VALUE mykey 0 10
+replace mykey 0 900 16
+some_other_value
+get mykey
+VALUE mykey 0 16

@@ -25,7 +25,12 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 	graph := new(gramfree.Graph)
 	metamap := new(gramfree.Metamap)
 	graph.Map = metamap
-	line_slice := strings.SplitAfter(testcase,"\n")
+	var line_slice []string
+	switch dbms {
+	case gramfree.Redis,gramfree.KeyDB:
+		// redis based is split after \n
+		line_slice = strings.SplitAfter(testcase,"\n")
+	}
 	for _,line := range line_slice {
 		// sequential execute one line, trim '\n'
 		line_len := len(line)

@@ -172,4 +172,5 @@ redis
 [CVE-2024-51480] RedisTimeSeries –  Integer Overflow RCE
 [CVE-2024-55656] RedisBloom –  Integer Overflow RCE
 ```
+3. use TSAN to check multi-thread vuln.
 
