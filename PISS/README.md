@@ -1,2 +1,0 @@
-# PISS
-piss-pwn
