@@ -23,3 +23,15 @@ Such as:
 - ireader, acrobat, foxit, MS-office, wps
 - qq-browser, edge, firefox (pdf.js)
 
+## install
+``` shell
+> git clone -b vx.y.z --depth=1 --recursive https://github.com/fuxxcss/fuxxing-fuzzing.git
+```
+
+## fuzz
+### antlr4 init
+``` shell
+> git submodule add -b vx.y.z --depth=1 -- https://github.com/antlr/antlr4.git antlr4
+> java 
+```
+
