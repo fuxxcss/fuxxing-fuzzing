@@ -47,7 +47,7 @@ DATA_INT        :('-' | '+')?[0-9]+;
 DATA_REAL       :('-' | '+')?[0-9]+SYM_DOT[0-9]+
                 |('-' | '+')?SYM_DOT[0-9]+
                 ;
-DATA_STR        :.+;
+DATA_STR        :.+?;
 
 SPACE           :' ' -> skip;
 NEWLINE         :'\r'?'\n' -> skip;

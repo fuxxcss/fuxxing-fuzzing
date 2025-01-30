@@ -25,16 +25,16 @@ Such as:
 
 ## install
 ``` shell
-> git submodule add https://github.com/antlr/antlr4.git antlr4
-> git submodule
-67228355c5bfd1ed5ebb89e726992ec43dda7b53 antlr4 (4.13.2-12-g67228355c)
-
+> git clone -b vx.y.z --depth=1 --recursive https://github.com/fuxxcss/fuxxing-fuzzing.git
 ```
 
 ## fuzz
 ### antlr4 init
 ``` shell
-> git submodule add -b vx.y.z --depth=1 -- https://github.com/antlr/antlr4.git antlr4
-> java 
+> git submodule add https://github.com/antlr/antlr4.git antlr4
+> git submodule
+67228355c5bfd1ed5ebb89e726992ec43dda7b53 antlr4 (4.13.2-12-g67228355c)
+> java -jar antlr-4.13.2-complete.jar -Dlanguage=Cpp lexer.g4
+> java -jar antlr-4.13.2-complete.jar -Dlanguage=Cpp parser.g4
 ```
 
