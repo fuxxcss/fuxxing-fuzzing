@@ -165,9 +165,9 @@ redis
 1. fix testcase length bug.
 2. learn from Redis CVEs.
 ``` shell
-// ?
+// vulnable lua generation
 [CVE-2024-46981] Lua Use-After-Free RCE
-// use afl mutator to mutate integer argument、identifier
+// use aflpp-havoc to mutate integer argument、identifier
 [CVE-2024-51737] RediSearch – Integer Overflow with LIMIT or KNN Arguments Lead to RCE
 [CVE-2024-51480] RedisTimeSeries –  Integer Overflow RCE
 [CVE-2024-55656] RedisBloom –  Integer Overflow RCE

@@ -1,4 +1,4 @@
-# Doc Fuzzer
+# File Fuzzer
 * [What is it ?](#introduction)
 * [How to Install ?](#install)
 * [How to Use ?](#fuzz)
@@ -7,21 +7,37 @@
 ## introduction
 Doc Formats:
 - pdf, epub, mobi, azw3, djvu
-- txt, rtf (email), clf (log) 
-- doc, xls, ppt, odt, ods, odp
+- txt, ttf, rtf (email), clf (log)
+- doc, xls, ppt, odt, ods, odp, xlb
 - pdb, dmp, core
+- ovf, vmx, cov
+- xml, json
 - cloud-doc
 
-Targets:
+Doc Targets:
 - reader, editor, browser, browser-extension
 - web-editor
 - printer, email-program, log-program
 - core-dump-helper
+- IoT
 
 Such as:
 - wechat-review, baidu-netdisk
 - ireader, acrobat, foxit, MS-office, wps
 - qq-browser, edge, firefox (pdf.js)
+
+Media Formats:
+- mp3, midi
+- 4xm, avi, mkv, ty, m3u8
+
+Media Targets:
+- smart-tv
+- camera
+
+Image Formats:
+- jpeg, png
+
+Image Targets:
 
 ## install
 ``` shell
@@ -37,4 +53,10 @@ Such as:
 > java -jar antlr-4.13.2-complete.jar -Dlanguage=Cpp lexer.g4
 > java -jar antlr-4.13.2-complete.jar -Dlanguage=Cpp parser.g4
 ```
+
+## ToDO
+1. create [doc].dict for mutation
+2. mutator ( aflpp-havoc + dict )
+1. multi-thread fuxxing
+2. vulnable javascript generation 
 
