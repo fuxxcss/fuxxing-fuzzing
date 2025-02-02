@@ -8,7 +8,7 @@
 Doc Formats:
 - pdf, epub, mobi, azw3, djvu
 - txt, ttf, rtf (email), clf (log)
-- doc, xls, ppt, odt, ods, odp, xlb
+- doc, xls, ppt, odt, ods, odp
 - pdb, dmp, core
 - ovf, vmx, cov
 - xml, json
@@ -55,7 +55,7 @@ Image Targets:
 ```
 
 ## ToDO
-1. create [doc].dict for mutation
+1. create [file].dict from generator
 2. mutator ( aflpp-havoc + dict )
 1. multi-thread fuxxing
 2. vulnable javascript generation 
