@@ -1,12 +1,13 @@
 
-
 //    Generator 
 
 
 #pragma once
 
 #include <string>
-using namespace std;
+#include <vector>
+using std::string;
+using std::vector;
 
 enum IR_TYPE{
     pdf,
@@ -24,12 +25,14 @@ enum IR_TYPE{
     data_int,
     data_str,
     data_real,
+    ir_vector,
 };
 
 union Data {
     string str_data;
     int int_data;
     float real_data;
+    vector *ir_vector;
 };
 
 class IR {
@@ -38,42 +41,55 @@ class IR {
         IR *ir_left;
         IR *ir_right;
         string ir_prefix;
+        string ir_middle;
         string ir_suffix;
         Data ir_data;
     public:
         /*  constructor */
-        IR(IR_TYPE type,IR *left = nullptr,IR *right = nullptr,string prefix = "",string suffix = "")
+        // prefix IR(left) middle IR(right) suffix
+        IR(IR_TYPE type,IR *left = nullptr,IR *right = nullptr,string prefix = "",string middle = "",string suffix = "")
             :ir_type(type),
             ir_left(left),
             ir_right(right),
             ir_prefix(prefix),
+            ir_middle(middle),
             ir_suffix(suffix),
             {}
-
-        IR(IR_TYPE type,int data,string prefix = "",string suffix = "")
+        IR(IR_TYPE type,int data)
             :ir_type(type),
             ir_left(nullptr),
             ir_right(nullptr),
-            ir_prefix(prefix),
-            ir_suffix(suffix),
+            ir_prefix(""),
+            ir_middle(""),
+            ir_suffix(""),
             { ir_data.int_data = data; }
 
-        IR(IR_TYPE type,string data,string prefix = "",string suffix = "")
+        IR(IR_TYPE type,string data)
             :ir_type(type),
             ir_left(nullptr),
             ir_right(nullptr),
-            ir_prefix(prefix),
-            ir_suffix(suffix),
+            ir_prefix(""),
+            ir_middle(""),
+            ir_suffix(""),
             { ir_data.str_data = data; }
 
-        IR(IR_TYPE type,float data,string prefix = "",string suffix = "")
+        IR(IR_TYPE type,float data)
             :ir_type(type),
             ir_left(nullptr),
             ir_right(nullptr),
-            ir_prefix(prefix),
-            ir_suffix(suffix),
+            ir_prefix(""),
+            ir_middle(""),
+            ir_suffix(""),
             { ir_data.real_data = data; }
 
+        IR(IR_TYPE type,vector *irv)
+            :ir_type(type),
+            ir_left(nullptr),
+            ir_right(nullptr),
+            ir_prefix(""),
+            ir_middle(""),
+            ir_suffix(""),
+            { ir_data.ir_vector = irv; }
         /*  destructor  */
         ~IR(){
             if(ir_left) delete ir_left;
@@ -101,6 +117,9 @@ string IR::ir_string(){
     }
 
     if(ir_left) res += ir_left->ir_string();
+
+    res += ir_middle;
+
     if(ir_right) res += ir_right->ir_string();
 
     res += ir_suffix;
@@ -113,6 +132,6 @@ class Generator {
     public:
         /*  pure virtual funcs  */
         virtual IR *generate_ir() = 0;
-        virtual void generate_dict() = 0;
+        virtual void generate_dict(string dict_path) = 0;
 };
 

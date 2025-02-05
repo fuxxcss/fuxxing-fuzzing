@@ -13,42 +13,42 @@ options {
 #include <PDFLexerBase.h>
 }
 
-OBJ             :'obj';
-OBJ_END         :'endobj';
-OBJ_NULL        :'null';
-OBJ_BOOL        :'true'|'false'|'True'|'False'|'TRUE'|'FALSE';
+OBJ             :'obj'(SPACE | NEWLINE)?;
+OBJ_END         :'endobj'(SPACE | NEWLINE)?;
+OBJ_NULL        :'null'(SPACE | NEWLINE)?;
+OBJ_BOOL        :'true'|'false'|'True'|'False'|'TRUE'|'FALSE'(SPACE | NEWLINE)?;
 
-REFERENCE       :'R';
+REFERENCE       :'R'(SPACE | NEWLINE)?;
 
-STREAM          :'stream';
-STREAM_END      :'endstream';
+STREAM          :'stream'(SPACE | NEWLINE)?;
+STREAM_END      :'endstream'(SPACE | NEWLINE)?;
 
-XREF            :'xref';
-XREF_USE        :'n';
-XREF_FREE       :'f';
+XREF            :'xref'(SPACE | NEWLINE)?;
+XREF_USE        :'n'(SPACE | NEWLINE)?;
+XREF_FREE       :'f'(SPACE | NEWLINE)?;
 
-TRAIL           :'trailer';
-TRAIL_XREF      :'startxref';
-TRAIL_END       :'%%EOF';
+TRAIL           :'trailer'(SPACE | NEWLINE)?;
+TRAIL_XREF      :'startxref'(SPACE | NEWLINE)?;
+TRAIL_END       :'%%EOF'(SPACE | NEWLINE)?;
 
-SYM_MOD         :'%';
-SYM_DOT         :'.';
-SYM_LAB         :'<';
-SYM_RAB         :'>';
-SYM_LDAB        :'<<';
-SYM_RDAB        :'>>';
-SYM_FS          :'/';
-SYM_LP          :'(';
-SYM_RP          :')';
-SYM_LSP         :'[';
-SYM_RSP         :']';
+SYM_MOD         :'%'(SPACE | NEWLINE)?;
+SYM_DOT         :'.'(SPACE | NEWLINE)?;
+SYM_LAB         :'<'(SPACE | NEWLINE)?;
+SYM_RAB         :'>'(SPACE | NEWLINE)?;
+SYM_LDAB        :'<<'(SPACE | NEWLINE)?;
+SYM_RDAB        :'>>'(SPACE | NEWLINE)?;
+SYM_FS          :'/'(SPACE | NEWLINE)?;
+SYM_LP          :'('(SPACE | NEWLINE)?;
+SYM_RP          :')'(SPACE | NEWLINE)?;
+SYM_LSP         :'['(SPACE | NEWLINE)?;
+SYM_RSP         :']'(SPACE | NEWLINE)?;
 
-DATA_INT        :('-' | '+')?[0-9]+;
-DATA_REAL       :('-' | '+')?[0-9]+SYM_DOT[0-9]+
-                |('-' | '+')?SYM_DOT[0-9]+
+DATA_INT        :('-' | '+')?[0-9]+(SPACE | NEWLINE)?;
+DATA_REAL       :('-' | '+')?[0-9]+SYM_DOT[0-9]+(SPACE | NEWLINE)?
+                |('-' | '+')?SYM_DOT[0-9]+(SPACE | NEWLINE)?
                 ;
-DATA_STR        :.+?;
+DATA_STR        :.+?(SPACE | NEWLINE)?;
 
-SPACE           :' ' -> skip;
-NEWLINE         :'\r'?'\n' -> skip;
+SPACE           :' ';
+NEWLINE         :'\r'?'\n';
 

@@ -9,8 +9,11 @@ extern
 class pdf_generator : public Generator{
     private:
         string pdf;
+        string dict;
     public:
-        pdf_generator(string pdf_str):pdf(pdf_str){}
+        pdf_generator(string pdf_str,string dict_path):pdf(pdf_str),dict(dict_path){}
+        IR *generate_ir();
+        void generate_dict();
 };
 
 IR *pdf_generator::generate_ir(){
@@ -28,4 +31,8 @@ IR *pdf_generator::generate_ir(){
         return nullptr;
     }
     else return listener.ir;
+}
+
+void pdf_generator::generate_dict(){
+    
 }
