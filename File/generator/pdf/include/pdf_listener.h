@@ -8,7 +8,9 @@
 class  pdf_listener : public antlr4::tree::ParseTreeListener {
 public:
 
-  IR *ir;
+  IR *pdf_ir;
+
+  virtual void enterPdf(pdf_parser::PdfContext *ctx);
 
   virtual void exitPdf(pdf_parser::PdfContext *ctx);
 
@@ -33,5 +35,13 @@ public:
   virtual void exitPdf_xref_table(pdf_parser::Pdf_xref_tableContext *ctx);
 
   virtual void exitPdf_trailer(pdf_parser::Pdf_trailerContext *ctx);
+
+  virtual void exitPdf_data_array(pdf_parser::Pdf_data_arrayContext *ctx);
+
+  virtual void exitData_int(pdf_parser::Data_intContext *ctx);
+
+  virtual void exitData_real(pdf_parser::Data_realContext *ctx);
+
+  virtual void exitData_str(pdf_parser::Data_strContext *ctx);
 
 };

@@ -10,6 +10,16 @@ using std::vector;
 // stack push middle-process IR
 static stack<IR *> *ir_stack;
 
+void free_stack(){
+
+    while(!ir_stack->empty()){
+        IR *ir = ir_stack->pop();
+        delete ir;
+    }
+
+    delete ir_stack;
+}
+
 void pdf_listener::enterPdf(pdf_parser::PdfContext *ctx){
 
     ir_stack = new stack<IR *>;
@@ -18,7 +28,7 @@ void pdf_listener::enterPdf(pdf_parser::PdfContext *ctx){
 void pdf_listener::exitPdf(pdf_parser::PdfContext *ctx){
     
     size_t body_size = ctx->pdf_body().size();
-    vector *irv = new vector;
+    vector<IR *> *irv = new vector;
     while(body_size){
         irv->insert(irv->begin(),ir_stack->pop());
         -- body_size;
@@ -47,7 +57,7 @@ void pdf_listener::exitPdf_body(pdf_parser::Pdf_bodyContext *ctx){
     }
 
     size_t obj_size = ctx->pdf_obj().size();
-    vector *irv = new vector;
+    vector<IR *> *irv = new vector;
     while(obj_size){
         irv->insert(irv->begin(),ir_stack->pop());
         -- obj_size;
@@ -75,7 +85,7 @@ void pdf_listener::exitPdf_obj(pdf_parser::Pdf_objContext *ctx){
     IR *ir = nullptr;
     if(ctx->OBJ()){
         size_t obj_size = ctx->pdf_obj().size();
-        vector *irv = new vector;
+        vector<IR *> *irv = new vector;
         while(obj_size){
             irv->insert(irv->begin(),ir_stack->pop());
             -- obj_size;
@@ -126,7 +136,7 @@ void pdf_listener::exitPdf_obj_string(pdf_parser::Pdf_obj_stringContext *ctx){
 void pdf_listener::exitPdf_obj_array(pdf_parser::Pdf_obj_arrayContext *ctx){
 
     size_t obj_size = ctx->pdf_obj().size();
-    vector *irv = new vector;
+    vector<IR *> *irv = new vector;
     while(obj_size){
         irv->insert(irv->begin(),ir_stack->pop());
         -- obj_size;
@@ -151,7 +161,7 @@ void pdf_listener::exitPdf_obj_dictionary(pdf_parser::Pdf_obj_dictionaryContext 
         ir = new IR(pdf_obj_dictionary,left,right);
     }else{
         size_t obj_dict_size = ctx->pdf_obj_dictionary().size();
-        vector *irv = new vector;
+        vector<IR *> *irv = new vector;
         while(obj_dict_size){
             irv->insert(irv->begin(),ir_stack->pop());
             -- obj_dict_size;
@@ -183,7 +193,7 @@ void pdf_listener::exitPdf_obj_stream(pdf_parser::Pdf_obj_streamContext *ctx){
 
     IR *right = ir_stack->pop();
     size_t obj_stream_size = ctx->pdf_obj_stream().size();
-    vector *irv = new vector;
+    vector<IR *> *irv = new vector;
     while(obj_stream_size){
         irv->insert(irv->begin(),ir_stack->pop());
         -- obj_stream_size;
@@ -203,7 +213,7 @@ void pdf_listener::exitPdf_xref_table(pdf_parser::Pdf_xref_tableContext *ctx){
     IR *ir;
     if(ctx->XREF()){
         size_t xref_table_size = ctx->pdf_xref_table().size();
-        vector *irv = new vector;
+        vector<IR *> *irv = new vector;
         while(xref_table_size){
             irv->insert(irv->begin(),ir_stack->pop());
             -- xref_table_size;
@@ -240,7 +250,7 @@ void pdf_listener::exitPdf_trailer(pdf_parser::Pdf_trailerContext *ctx){
 
     IR *right = ir_stack->pop();
     size_t obj_dict_size = ctx->pdf_obj_dictionary().size();
-    vector *irv = new vector;
+    vector<IR *> *irv = new vector;
     while(obj_dict_size){
         irv->insert(irv->begin(),ir_stack->pop());
         -- obj_dict_size;
@@ -288,7 +298,3 @@ void pdf_listener::exitData_str(pdf_parser::Data_strContext *ctx){
 
     ir_stack->push(ir);
 }
-
-
-
-
