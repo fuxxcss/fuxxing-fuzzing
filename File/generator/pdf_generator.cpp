@@ -16,22 +16,27 @@ class pdf_generator : public Generator{
 
     private:
         const string &pdf;
-        IR *pdf_ir;
         string &pdf_dict;
 
     public:
+        IR *ir;
+        vector<IR *> *ir_library;
+        vector<IR *> ir_reuse;
         /*  construct   */
-        pdf_generator(const string &str,string &path):pdf(str),pdf_dict(path){}
+        pdf_generator(const string &str,string &path)
+            :pdf(str),pdf_dict(path),ir(nullptr),ir_library(nullptr)
+            {}
         /*  destruct    */
         ~pdf_generator(){
-            delete pdf_ir;
+            delete ir;
+            delete ir_library;
         }
 
-        IR *generate_ir();
-        bool generate_dict();
+        void generate_ir();
+        void generate_dict();
 };
 
-IR *pdf_generator::generate_ir(){
+void pdf_generator::generate_ir(){
 
     antlr4::ANTLRInputStream input(pdf);
     pdf_lexer lexer(&input);
@@ -45,21 +50,19 @@ IR *pdf_generator::generate_ir(){
     antlr4::tree::ParseTreeWalker walker;
     walker.walk(listener,parser.pdf());
     
-    if(parser.getNumberOfSyntaxErrors() > 0){
+    if(parser.getNumberOfSyntaxErrors() <= 0){
 
-        free_stack();
-        return nullptr;
-    }else{
-
-        pdf_ir = listener.ir;
-        return pdf_ir;
+        ir = listener.ir;
+        ir_library = listener.pdf_ir_library;
     }
+
+    free_stack();
 }
 
-bool pdf_generator::generate_dict(){
+void pdf_generator::generate_dict(){
     
-    ifstream dict_in(path);
-    if(!dict_in.is_open()) return false;
+    ifstream dict_in(pdf_dict);
+    if(!dict_in.is_open()) assert("pdf dict failed.");
 
     /*  origin,append dict    */
     set<string> origin,append;
@@ -70,9 +73,9 @@ bool pdf_generator::generate_dict(){
     }
     dict_in.close();
 
-    /*  level order pdf_ir */
+    /*  level order ir */
     queue<IR *> q;
-    q.push(pdf_ir);
+    q.push(ir);
     while(!q.empty()){
         IR *ir = q.pop();
         if(ir->ir_left) q.push(ir->ir_left);
@@ -83,7 +86,7 @@ bool pdf_generator::generate_dict(){
 
         switch(ir->ir_type){
         /*  ir vector   */
-        case ir_vector:
+        case IR_VECTOR:
             size_t size = ir->ir_vector->size();
             while(size){
                 q.push(ir->ir_vector[size-1]);
@@ -91,8 +94,8 @@ bool pdf_generator::generate_dict(){
             }
             break;
         /*  keyword */
-        case pdf_obj_name:
-        case pdf_obj_string:
+        case IR_PDF_OBJ_NAME:
+        case IR_PDF_OBJ_STRING:
             if(!origin.count(ir->ir_data.str_data)) append.insert(ir->ir_data.str_data);
             break;
         }
@@ -100,10 +103,8 @@ bool pdf_generator::generate_dict(){
     /*  erase empty string  */
     append.erase("");
 
-    ofstream dict_out(path);
-    if(!dict_out.is_open()) return false;
-    size_t size = append.size();
-    for(int i = 0; i < size; i++) dict_out << append[i];
+    ofstream dict_out(pdf_dict);
+    if(!dict_out.is_open()) assert("pdf dict failed.");
+    for(auto i : append) dict_out << i;
 
-    return true;
 }

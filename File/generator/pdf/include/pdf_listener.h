@@ -9,6 +9,7 @@ class  pdf_listener : public antlr4::tree::ParseTreeListener {
 public:
 
   IR *pdf_ir;
+  vector<IR *> *pdf_ir_library;
 
   virtual void enterPdf(pdf_parser::PdfContext *ctx);
 
