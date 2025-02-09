@@ -31,5 +31,6 @@ class Mutator {
         }
 
         void generator(string &);
-        bool mutate();
+        /*  max size as input   */
+        bool mutate(size_t);
 };
