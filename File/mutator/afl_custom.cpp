@@ -19,9 +19,13 @@ size_t afl_custom_fuzz(Mutator *mutator, uint8_t *buf, size_t buf_size,
     mutator->generator(string((char*)buf));
     
     if(mutator->mutate()){
+      /*  mutate successfully */
         *out_buf = (u8 *)mutator->current_input.c_str();
         return mutator->mutated.size();
-    }else return buf_size;
+    }else{
+      /*  drop it */
+      return buf_size;
+    }
 }
 
 }

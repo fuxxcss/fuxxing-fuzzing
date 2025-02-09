@@ -8,15 +8,16 @@ class Mutator {
     private:
         afl_state_t *afl;
         Generator *gen;
-        unsigned int mutate_rand;
+        vector<IR *> ir_freed;
 
-        IR *locate();
+        IR *locate(unsigned int);
         /*  two rand_ir funcs   */
         IR *rand_ir();
         IR *rand_ir(IR *);
-        void mutation_insert();
-        void mutation_delete();
-        void mutation_replace();
+        IR *havoc_rand_ir();
+        void mutation_insert(unsigned int);
+        void mutation_delete(unsigned int);
+        void mutation_replace(unsigned int);
         
     public:
         string mutated;
@@ -26,6 +27,7 @@ class Mutator {
         }
         ~Mutator(){
             if(gen) delete gen;
+            for(auto i : ir_freed) delete i;
         }
 
         void generator(string &);

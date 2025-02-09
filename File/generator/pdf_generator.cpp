@@ -21,7 +21,6 @@ class pdf_generator : public Generator{
     public:
         IR *ir;
         vector<IR *> *ir_library;
-        vector<IR *> ir_reuse;
         /*  construct   */
         pdf_generator(const string &str,string &path)
             :pdf(str),pdf_dict(path),ir(nullptr),ir_library(nullptr)
