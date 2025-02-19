@@ -1,0 +1,16 @@
+set runoob 0 900 9
+memcached
+get runoob
+VALUE runoob 0 9
+append runoob 0 900 5
+redis
+get runoob
+VALUE runoob 0 14
+set runoob 0 900 9
+memcached
+get runoob
+VALUE runoob 0 9
+prepend runoob 0 900 5
+redis
+get runoob
+VALUE runoob 0 14
