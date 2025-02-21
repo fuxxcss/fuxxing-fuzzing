@@ -15,51 +15,77 @@ import (
 
 // Commands
 var (
-	Ping = C.CString("stats sizes")
 	Flushall = C.CString("flush_all")
 	ITEMS = C.CString("stats items")
 	KEYS = C.CString("stats cachedump %s 0")
 )
 
-type RedisClient struct {
+type MemcachedClient struct {
 	conn_ip string
 	conn_port int
-	conn *C.redisContext
+	conn *C.memcached_st
+	rc C.memcached_return_t
 }
 
-func (self *RedisClient) Connect(ip string,port int) bool {
+func (self *MemcachedClient) Connect(ip string,port int) bool {
 	// cgo string -> char*
-	conn := C.redisConnect(C.CString(ip),C.int(port))
-	if conn == nil || conn.err != 0 {
+	conn := C.memcached_create(nil)
+	if conn == nil {
 		return false
 	}
 	self.conn = conn
-	return true
-}
-
-func (self *RedisClient) Reconnect() bool {
-	ret := C.redisReconnect(self.conn)
-	if ret == C.REDIS_ERR {
+	rc := C.memcached_server_add(conn,C.CString(ip),C.int(port))
+	if rc != C.MEMCACHED_SUCCESS {
+		C.memcached_free(conn)
+		self.conn = nil
 		return false
 	}
+	self.rc = rc
+	self.conn_ip = ip
+	self.conn_port = port
 	return true
 }
 
-func (self *RedisClient) Check_alive() bool {
-	res := C.redisCommand_one(self.conn,Ping)
-	if res == nil || C.redisReply_type(res) == C.REDIS_REPLY_ERROR { return false }
+func (self *MemcachedClient) Reconnect() bool {
+
+	ret := self.Connect(self.conn_ip,self.conn_port)
+	if !ret return false
 	return true
 }
 
-func (self *RedisClient) Clean_up() bool {
+func (self *MemcachedClient) Check_alive() bool {
+	res := C.memcached_version(self.conn)
+	if res != C.MEMCACHED_SUCCESS return false 
+	return true
+}
+
+func (self *MemcachedClient) Clean_up() bool {
+	res := C.memcached_flush(self.conn,0)
 	res := C.redisCommand_one(self.conn,Flushall)
-	if res == nil || C.redisReply_type(res) == C.REDIS_REPLY_ERROR { return false }
+	if res != C.MEMCACHED_SUCCESS return false 
 	return true
 }
 
-func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
+func (self *MemcachedClient) Execute(command string) gramfree.DBMStatus {
 	//fmt.Println(command)
-	cstr := C.CString(command)
+	commstr_slice := strings.Split(command,"\n")
+	commstr_1 := commstr_slice[0]
+	commstr_2 := commstr_slice[1]
+	comm := strings.Split(commstr_1," ")[0]
+	/*	todo	*/
+	switch comm {
+	case "GET","get":
+	case "SET","set":
+	gets/*合并到get*/
+	add
+	replace
+	append
+	prepend
+	cas
+	delete
+	incr
+	decr
+	}
 	res := C.redisCommand_one(self.conn,cstr)
 	//fmt.Println(C.GoString(res.str))
 	if C.redisReply_type(res) == C.REDIS_REPLY_ERROR {
@@ -75,7 +101,7 @@ func (self *RedisClient) Execute(command string) gramfree.DBMStatus {
 }
 
 // return tuple (name,type,parent_name)
-func (self *RedisClient) Collect_metadata() [][3]string {
+func (self *MemcachedClient) Collect_metadata() [][3]string {
 	res := C.redisCommand_one(self.conn,KEYS)
 	ret := make([][3]string,0)
 	var tuple,ftuple [3]string
@@ -144,7 +170,7 @@ func (self *RedisClient) Collect_metadata() [][3]string {
 	return ret
 }
 
-func (self *RedisClient) Restart() bool {
+func (self *MemcachedClient) Restart() bool {
 	os.Setenv("AFL_MAP_SIZE",gramfree.AFL_MAP_SIZE)
 	os.Setenv("__AFL_SHM_ID",gramfree.AFL_SHM_ID)
 	program := "/usr/local/redis/src/redis-server"
