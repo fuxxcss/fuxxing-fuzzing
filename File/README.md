@@ -1,4 +1,4 @@
-# File Fuzzer
+# Doc Fuzzer
 * [What is it ?](#introduction)
 * [How to Install ?](#install)
 * [How to Use ?](#fuzz)
@@ -25,19 +25,6 @@ Such as:
 - wechat-review, baidu-netdisk
 - ireader, acrobat, foxit, MS-office, wps
 - qq-browser, edge, firefox (pdf.js)
-
-Media Formats:
-- mp3, midi
-- 4xm, avi, mkv, ty, m3u8
-
-Media Targets:
-- smart-tv
-- camera
-
-Image Formats:
-- jpeg, png
-
-Image Targets:
 
 ## install
 ``` shell
