@@ -1,16 +1,12 @@
 set runoob 0 900 9
-memcached
-get runoob
-VALUE runoob 0 9
+memcached;
+get runoob;
 append runoob 0 900 5
-redis
-get runoob
-VALUE runoob 0 14
+redis;
+get runoob;
 set runoob 0 900 9
-memcached
-get runoob
-VALUE runoob 0 9
+memcached;
+get runoob;
 prepend runoob 0 900 5
-redis
-get runoob
-VALUE runoob 0 14
+redis;
+get runoob;

@@ -1,16 +1,11 @@
 set runoob 0 900 9
-memcached
-gets runoob
-VALUE runoob 0 9 1
-delete runoob
-get runoob
+memcached;
+gets runoob;
+delete runoob;
+get runoob;
 set visitors 0 900 2
-10
-incr visitors 5
-15
-get visitors
-VALUE visitors 0 2
-decr visitors 5
-5
-get visitors
-VALUE visitors 0 1
+10;
+incr visitors 5;
+get visitors;
+decr visitors 5;
+get visitors;

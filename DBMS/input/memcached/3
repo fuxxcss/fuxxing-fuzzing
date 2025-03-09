@@ -1,15 +1,13 @@
 set tp 0 900 9
-memcached
+memcached;
 cas tp 0 900 5 1
-redis
+redis;
 cas tp 0 900 9 2
-memcached
+memcached;
 set tp 0 900 9
-memcached
+memcached;
 cas tp 0 900 5 2
-redis
+redis;
 cas tp 0 900 5 1
-redis
-get tp
-VALUE tp 0 5
-redis
+redis;
+get tp;

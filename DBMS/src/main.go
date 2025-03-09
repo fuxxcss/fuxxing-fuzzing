@@ -28,18 +28,15 @@ func testcase_loop(testcase string) gramfree.DBMStatus {
 	var line_slice []string
 	switch dbms {
 	case gramfree.Redis,gramfree.KeyDB:
-		// redis based is split after \n
-		line_slice = strings.SplitAfter(testcase,"\n")
+		// redis based is split by \n
+		line_slice = strings.Split(testcase,"\n")
+	case gramfree.Memcached:
+		// memcached is split by ;
+		line_slice = string.Split(testcase,";")
 	}
 	for _,line := range line_slice {
-		// sequential execute one line, trim '\n'
-		line_len := len(line)
-		if line_len == 0 { continue }
-		if line[line_len-1] == '\n' {
-			status = client.Execute(line[:line_len-1])
-		}else{
-			status = client.Execute(line)
-		}
+		// sequential execute one line 
+		status = client.Execute(line)
 		// deal with Crash
 		if status == gramfree.Crash {
 			fmt.Println("[*] Crash found ")

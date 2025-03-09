@@ -68,15 +68,22 @@ func (self *MemcachedClient) Clean_up() bool {
 
 func (self *MemcachedClient) Execute(command string) gramfree.DBMStatus {
 	//fmt.Println(command)
-	commstr_slice := strings.Split(command,"\n")
-	commstr_1 := commstr_slice[0]
-	commstr_2 := commstr_slice[1]
-	comm := strings.Split(commstr_1," ")[0]
+	command_slice := strings.Split(command," ")
+	comm := command_slice[0]
 	/*	todo	*/
 	switch comm {
 	case "GET","get":
+		key := command_slice[1]
+		C.memcached_get(self.conn,key,len(key),nil,0,&self.rc)
 	case "SET","set":
-	gets/*合并到get*/
+		key := command_slice[1]
+		flags := command_slice[2]
+		exptime := command_slice[3]
+		bytes := strings.Split(command_slice[4],"\n")[0]
+		value := strings.Split(command_slice[4],"\n")[1]
+		self.rc = C.memcached_set(self.conn,key,len(key),value,len(value),exptime,flags)
+	/* todo */
+	gets
 	add
 	replace
 	append
