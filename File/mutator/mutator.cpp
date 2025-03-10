@@ -1,30 +1,41 @@
-#include "generator.h"
+#include "generator.hpp"
 #include "afl-fuzz.h"
 #include "afl-mutations.h"
 #include "mutator.h"
+#include <functional>
 #include <cassert>
 #include <vector>
 #include <string>
 #include <stack>
 
+using std::hash;
 using std::stack;
 using std::vector;
 using std::string;
 
-const string PATH = "./fuzz/dumb/";
-const string PDF = "pdf.dict";
-const string MP4 = "mp4.dict";
 const unsigned int ROUNDS = 32;
 const unsigned int HAVOC_STEPS = 20;
 const unsigned int HAVOC_ALGOS = 16;
 const unsigned int MUTATE_ALGOS = 3;
 
+constexpr unsigned int hash_str(string str){
+
+    return hash<string>(str);
+}
+
 void Mutator::generator(string &str){
 
-    char *t = getenv("Target");
+    string t = string(getenv(__TARGET__));
     if(!t) gen = nullptr;
-    if(strcmp(t,"PDF") == 0) gen = new pdf_generator(str,PATH + PDF);
-    // if(strcmp(t,"MP4") == 0) gen = new mp4_generator(str,path + mp4);
+    
+    switch(hash_str(t)){
+        #ifdef __PDF__
+        case hash_str(__PDF_STR__): gen = new Generator<pdf>(str,__PDF_PATH__); break;
+        #endif
+        #ifdef __JSON__
+        case hash_str(__JSON_STR__): gen = new Generator<json>(str,__JSON_PATH__); break;
+        #endif
+    }
 }
 
 bool Mutator::mutate(size_t max_len){

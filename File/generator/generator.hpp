@@ -3,169 +3,155 @@
 
 
 #pragma once
-
+#include <fstream>
+#include <set>
+#include <queue>
 #include <string>
 #include <vector>
+#include <antlr4-runtime/ANTLRInputStream.h>
+#include "ir.hpp"
+
+#ifdef __PDF__
+#include "pdf_lexer.h"
+#include "pdf_parser.h"
+#include "pdf_listener.h"
+#endif
+
+#ifdef __JSON__
+#include "json_lexer.h"
+#include "json_parser.h"
+#include "json_listener.h"
+#endif
 
 using std::string;
 using std::vector;
+using std::set;
+using std::queue;
+using std::ifstream;
+using std::ofstream;
 
-const unsigned int itoa = 4;
+/*  Traits  */
+template<typename Trait> struct Gen_Traits;
 
-enum PDF_TYPE{
-    IR_PDF = itoa,
-    IR_PDF_HEADER,
-    IR_PDF_BODY,
-    IR_PDF_OBJ,
-    IR_PDF_OBJ_NAME,
-    IR_PDF_OBJ_STRING,
-    IR_PDF_OBJ_ARRAY,
-    IR_PDF_OBJ_DICT,
-    IR_PDF_OBJ_REF,
-    IR_PDF_STREAM,
-    IR_PDF_XREF_TABLE,
-    IR_PDF_TRAILER,
-    IR_PDF_DATA_ARRAY,
+#ifdef __PDF__
+enum class pdf;
+template<> struct Gen_Traits<pdf>{
+    using Lexer = pdf_lexer;
+    using Praser = pdf_parser;
+    using Listener = pdf_listener;
 };
+#endif
 
-enum IR_TYPE{
-    IR_DATA_INT = 0,
-    IR_DATA_STR,
-    IR_DATA_REAL,
-    IR_VECTOR,
+#ifdef __JSON__
+enum class json;
+template<> struct Gen_Traits<json>{
+    using Lexer = json_lexer;
+    using Praser = json_parser;
+    using Listener = json_listener;
 };
+#endif
 
-union Data {
-    string str_data;
-    int int_data;
-    float real_data;
-};
-
-class IR {
-
-    public:
-        IR_TYPE ir_type;
-        IR *ir_left;
-        IR *ir_right;
-        string ir_prefix;
-        string ir_middle;
-        string ir_suffix;
-        vector<IR *> *ir_vector;
-        Data ir_data;
-
-        /*  constructor */
-        // prefix IR(left) middle IR(right) suffix
-        IR(IR_TYPE type,IR *left = nullptr,IR *right = nullptr,string prefix = "",string middle = "",string suffix = "")
-            :ir_type(type),
-            ir_left(left),
-            ir_right(right),
-            ir_prefix(prefix),
-            ir_middle(middle),
-            ir_suffix(suffix),
-            {}
-        IR(IR_TYPE type,int data)
-            :ir_type(type),
-            ir_left(nullptr),
-            ir_right(nullptr),
-            ir_prefix(""),
-            ir_middle(""),
-            ir_suffix(""),
-            { ir_data.int_data = data; }
-
-        IR(IR_TYPE type,string data)
-            :ir_type(type),
-            ir_left(nullptr),
-            ir_right(nullptr),
-            ir_prefix(""),
-            ir_middle(""),
-            ir_suffix(""),
-            { ir_data.str_data = data; }
-
-        IR(IR_TYPE type,float data)
-            :ir_type(type),
-            ir_left(nullptr),
-            ir_right(nullptr),
-            ir_prefix(""),
-            ir_middle(""),
-            ir_suffix(""),
-            { ir_data.real_data = data; }
-
-        IR(IR_TYPE type,vector<IR *> *irv)
-            :ir_type(type),
-            ir_left(nullptr),
-            ir_right(nullptr),
-            ir_prefix(""),
-            ir_middle(""),
-            ir_suffix(""),
-            { ir_vector = irv; }
-        /*  deep copy   */
-        IR(IR *ir){
-            ir_type = ir->ir_type;
-            ir_left = new IR(ir->ir_left);
-            ir_right = new IR(ir->ir_right);
-            ir_prefix = ir->ir_prefix;
-            ir_middle = ir->ir_middle;
-            ir_suffix = ir->ir_suffix;
-            ir_vector = new vector<IR *>(ir->ir_vector);
-            ir_data = ir->ir_data;
-        }
-        /*  destructor  */
-        ~IR(){
-            if(ir_vector){
-                while(!ir_vector->empty()) delete(ir_vector->pop_back());
-                delete ir_vector;
-            }
-            if(ir_left) delete ir_left;
-            if(ir_right) delete ir_right;
-        }
-        /*  ir to string    */
-        string ir_string();
-};
-
-string IR::ir_string(){
-
-    string res = "";
-    res += ir_prefix;
-
-    switch(ir_type){
-    case IR_DATA_INT:
-        res += to_string(ir_data.int_data);
-        break;
-    case IR_DATA_REAL:
-        res += to_string(ir_data.real_data);
-        break;
-    case IR_DATA_STR:
-        res += ir_data.str_data;
-        break;
-    case IR_VECTOR:
-        size_t size = ir_vector->size();
-        for(int i = 0; i < size; i++){
-            
-            res += ir_vector[i]->ir_string();
-        }
-    }
-
-    if(ir_left) res += ir_left->ir_string();
-
-    res += ir_middle;
-
-    if(ir_right) res += ir_right->ir_string();
-
-    res += ir_suffix;
-
-    return res;
-}
-
-// Base Class
+template<typename Trait>
 class Generator {
     private:
-        const string &str;
+
+        const string &text;
         string &dict;
     public:
         IR *ir;
-        vector<IR *> ir_library;
-        /*  pure virtual funcs  */
-        virtual void generate_ir() = 0;
-        virtual void generate_dict() = 0;
+        vector<IR *> *ir_library;
+        /*  construct   */
+        Generator(const string &str,string &path)
+            :text(str),dict(path),ir(nullptr),ir_library(nullptr)
+            {}
+        /*  destruct    */
+        ~Generator(){
+            delete ir;
+            delete ir_library;
+        }
+
+        void generate_ir();
+        void generate_dict();
 };
 
+template<typename Trait>
+void Generator<Trait>::generate_ir(){
+
+    antlr4::ANTLRInputStream input(text);
+    /*  lexer   */
+    Gen_Traits<Trait>::Lexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    /*  parser  */
+    Gen_Traits<Trait>::Parser parser(&tokens);
+    parser.removeErrorListeners();
+    /*  listener    */
+    Gen_Traits<Trait>::Listener listener;
+    antlr4::tree::ParseTreeWalker walker;
+    /*  top node    */
+    walker.walk(listener,parser.Doc_Format());
+    
+    if(parser.getNumberOfSyntaxErrors() <= 0){
+
+        ir = listener.ir;
+        ir_library = listener.ir_library;
+    }
+}
+
+/*  todo    */
+template<typename Trait>
+void Generator<Trait>::generate_dict(){
+    
+    ifstream dict_in(dict);
+    if(!dict_in.is_open()) assert("dict failed.");
+
+    /*  origin,append dict    */
+    set<string> origin,append;
+    string line;
+    while(std::getline(dict_in,line)){
+        string tmp = line;
+        origin.insert(tmp);
+    }
+    dict_in.close();
+
+    /*  level order ir */
+    queue<IR *> q;
+    q.push(ir);
+    while(!q.empty()){
+        IR *ir = q.pop();
+        if(ir->ir_left) q.push(ir->ir_left);
+        if(ir->ir_right) q.push(ir->ir_right);
+        if(!origin.count(ir->ir_prefix)) append.insert(ir->ir_prefix);
+        if(!origin.count(ir->ir_middle)) append.insert(ir->ir_middle);
+        if(!origin.count(ir->ir_suffix)) append.insert(ir->ir_suffix);
+
+        switch(ir->ir_type){
+        /*  ir vector   */
+        case IR_VECTOR:
+            size_t size = ir->ir_vector->size();
+            while(size){
+                q.push(ir->ir_vector[size-1]);
+                -- size;
+            }
+            break;
+        #ifdef __PDF__
+        /*  pdf keywords    */
+        case IR_PDF_OBJ_NAME:
+        case IR_PDF_OBJ_STRING:
+            if(!origin.count(ir->ir_data.str_data)) append.insert(ir->ir_data.str_data);
+            break;
+        #endif
+
+        #ifdef __JSON__
+        /*  json keywords   */
+        /*  ... */
+        #endif
+        }
+    }
+    /*  erase empty string  */
+    append.erase("");
+
+    ofstream dict_out(dict);
+    if(!dict_out.is_open()) assert("dict failed.");
+    for(auto i : append) dict_out << i;
+
+}

@@ -5,8 +5,22 @@ project(DocFuzzer)
 add_subdirectory(generator)
 add_subdirectory(mutator)
 
-# find java
-find_package(Java REQUIRED)
+set(DOC_FUZZER_ROOT "${CMAKE_CURRENT_LIST_DIR}")
+set(DUMB_PATH       "${DOC_FUZZER_ROOT}/fuzz/dumb")
+option(__ALL__      "DOC Fuzzer"    OFF)
+option(__PDF__      "PDF Fuzzer"    OFF)
 
-#
-file(GLOB PDF_G4 "generator/")
+set(__TARGET__      "Target")
+set(__PDF_STR__     "PDF")
+set(__PDF_PATH__    "${DUMB_PATH}/pdf.dict")
+
+if(__ALL__)
+    set(__PDF__ ON)
+    
+endif()
+
+# Find ANTLR4
+message("Compile with ANTLR4")
+find_package(ANTLR4 REQUIRED)
+
+

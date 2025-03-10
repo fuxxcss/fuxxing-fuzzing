@@ -41,6 +41,15 @@ Such as:
 > java -jar antlr-4.13.2-complete.jar -Dlanguage=Cpp parser.g4
 ```
 
+## extend
+write *.g4, Top() api, listener.hpp
+``` shell
+/*  return pdf  */
+  PdfContext* Doc_Format(){
+    return pdf();
+  };
+```
+
 ## ToDO
 1. create [file].dict from generator
 2. mutator ( aflpp-havoc + dict )

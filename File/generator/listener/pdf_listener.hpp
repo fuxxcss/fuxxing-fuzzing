@@ -1,34 +1,54 @@
 #include <stack>
 #include <vector>
 #include "antlr4-runtime.h"
-#include "generator.h"
-#include "pdf_listener.h"
+#include "listener.hpp"
 
 using std::stack;
 using std::vector;
 
-#define collect_ir(IR *ir)\
-    ir_stack->push(ir);\
-    ir_library->push_back(ir);
+class  pdf_listener : public listener {
 
-#define POP() ({IR *pop_ir = ir_stack->top(); ir_stack->pop(); pop_ir;})
+public:
 
-// stack push middle-process IR
-static stack<IR *> *ir_stack;
+  virtual void enterPdf(pdf_parser::PdfContext *ctx);
 
-void free_stack(){
+  virtual void exitPdf(pdf_parser::PdfContext *ctx);
 
-    while(!ir_stack->empty()){
-        IR *ir = POP();
-        delete ir;
-    }
+  virtual void exitPdf_body(pdf_parser::Pdf_bodyContext *ctx);
 
-    delete ir_stack;
-}
+  virtual void exitPdf_header(pdf_parser::Pdf_headerContext *ctx);
+
+  virtual void exitPdf_obj(pdf_parser::Pdf_objContext *ctx);
+
+  virtual void exitPdf_obj_name(pdf_parser::Pdf_obj_nameContext *ctx);
+
+  virtual void exitPdf_obj_string(pdf_parser::Pdf_obj_stringContext *ctx);
+
+  virtual void exitPdf_obj_array(pdf_parser::Pdf_obj_arrayContext *ctx);
+
+  virtual void exitPdf_obj_dictionary(pdf_parser::Pdf_obj_dictionaryContext *ctx);
+
+  virtual void exitPdf_obj_reference(pdf_parser::Pdf_obj_referenceContext *ctx);
+
+  virtual void exitPdf_obj_stream(pdf_parser::Pdf_obj_streamContext *ctx);
+
+  virtual void exitPdf_xref_table(pdf_parser::Pdf_xref_tableContext *ctx);
+
+  virtual void exitPdf_trailer(pdf_parser::Pdf_trailerContext *ctx);
+
+  virtual void exitPdf_data_array(pdf_parser::Pdf_data_arrayContext *ctx);
+
+  virtual void exitData_int(pdf_parser::Data_intContext *ctx);
+
+  virtual void exitData_real(pdf_parser::Data_realContext *ctx);
+
+  virtual void exitData_str(pdf_parser::Data_strContext *ctx);
+
+};
 
 void pdf_listener::enterPdf(pdf_parser::PdfContext *ctx){
 
-    pdf_ir_library = new vector<IR *>;
+    ir_library = new vector<IR *>;
     ir_stack = new stack<IR *>;
 }
 
@@ -37,7 +57,7 @@ void pdf_listener::exitPdf(pdf_parser::PdfContext *ctx){
     vector<IR *> *irv = new vector<IR *>;
 
     for(auto i : ctx->pdf_body()){
-        IR *ii = POP();
+        IR *ii = pop();
         irv->insert(irv->begin(),ii);
     }
 
@@ -45,51 +65,50 @@ void pdf_listener::exitPdf(pdf_parser::PdfContext *ctx){
     IR *left = nullptr;
     if(ctx->pdf_header()) {
 
-        left = POP();
+        left = pop();
     }
 
     IR *ir = new IR(IR_PDF,left,right);
     pdf_ir = ir;
 
-    delete ir_stack;
 }
 
 void pdf_listener::exitPdf_body(pdf_parser::Pdf_bodyContext *ctx){
 
     IR *right = nullptr;
     if(ctx->pdf_xref_table && ctx->pdf_trailer){
-        IR *right_level_2 =POP();
-        IR *left_level_2 = POP();
+        IR *right_level_2 =pop();
+        IR *left_level_2 = pop();
 
         right = new IR(IR_PDF_BODY,left_level_2,right_level2);
     }
     else if(ctx->pdf_xref_table || ctx->pdf_trailer){
 
-        right = POP();
+        right = pop();
     }
 
     vector<IR *> *irv = new vector;
 
     for(auto i : ctx->pdf_obj()){
-        IR *ii = POP();
+        IR *ii = pop();
         irv->insert(irv->begin(),ii);
     }
 
     IR *left = new IR(IR_VECTOR,irv);
     IR *ir = new IR(IR_PDF_BODY,left,right);
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_header(pdf_parser::Pdf_headerContext *ctx){
 
-    IR *right = POP();
-    IR *left = POP();
+    IR *right = pop();
+    IR *left = pop();
 
     string middle = ctx->SYM_MOD()->getText();
     IR *ir = new IR(IR_PDF_HEADER,left,right,"",middle,"");
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_obj(pdf_parser::Pdf_objContext *ctx){
@@ -99,14 +118,14 @@ void pdf_listener::exitPdf_obj(pdf_parser::Pdf_objContext *ctx){
         vector<IR *> *irv = new vector;
 
         for(auto i : ctx->pdf_obj()){
-            IR *ii = POP();
+            IR *ii = pop();
             irv->insert(irv->begin(),ii);
         }
         
         IR *right = new IR(IR_VECTOR,irv);
         IR *left = nullptr;
         if(ctx->pdf_data_array()) {
-            left = POP();
+            left = pop();
         }
 
         string middle = ctx->OBJ()->getText();
@@ -114,21 +133,21 @@ void pdf_listener::exitPdf_obj(pdf_parser::Pdf_objContext *ctx){
 
         ir = new IR(IR_PDF_OBJ,left,right,"",middle,suffix);
     }else{
-        IR *left = POP();
+        IR *left = pop();
         ir = new IR(IR_PDF_OBJ,left);
     }
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_obj_name(pdf_parser::Pdf_obj_nameContext *ctx){
 
-    IR *left = POP();
+    IR *left = pop();
     string prefix = ctx->SYM_FS()->getText();
 
     IR * ir = new IR(IR_PDF_OBJ_NAME,left,nullptr,prefix);
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_obj_string(pdf_parser::Pdf_obj_stringContext *ctx){
@@ -142,10 +161,10 @@ void pdf_listener::exitPdf_obj_string(pdf_parser::Pdf_obj_stringContext *ctx){
         middle = ctx->SYM_RAB()->getText();
     }
 
-    IR *left = POP();
+    IR *left = pop();
     IR *ir = new IR(IR_PDF_OBJ_STRING,left,nullptr,prefix,middle);
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_obj_array(pdf_parser::Pdf_obj_arrayContext *ctx){
@@ -153,7 +172,7 @@ void pdf_listener::exitPdf_obj_array(pdf_parser::Pdf_obj_arrayContext *ctx){
     vector<IR *> *irv = new vector;
 
     for(auto i : ctx->pdf_obj()){
-        IR *ii = POP();
+        IR *ii = pop();
         irv->insert(irv->begin(),ii);
     }
 
@@ -164,15 +183,15 @@ void pdf_listener::exitPdf_obj_array(pdf_parser::Pdf_obj_arrayContext *ctx){
 
     IR *ir = new IR(IR_PDF_OBJ_ARRAY,left,nullptr,prefix,middle);
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_obj_dictionary(pdf_parser::Pdf_obj_dictionaryContext *ctx){
 
     IR *ir;
     if(ctx->pdf_obj_name()){
-        IR *right = POP();
-        IR *left = POP();
+        IR *right = pop();
+        IR *left = pop();
 
         ir = new IR(IR_PDF_OBJ_DICT,left,right);
     }else{
@@ -180,7 +199,7 @@ void pdf_listener::exitPdf_obj_dictionary(pdf_parser::Pdf_obj_dictionaryContext 
         vector<IR *> *irv = new vector;
 
         for(auto i : ctx->pdf_obj_dictionary()){
-            IR *ii = POP();
+            IR *ii = pop();
             irv->insert(irv->begin(),ii);
         }
         
@@ -192,26 +211,26 @@ void pdf_listener::exitPdf_obj_dictionary(pdf_parser::Pdf_obj_dictionaryContext 
         ir = new IR(IR_PDF_OBJ_DICT,left,"",prefix,middle);
     }
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_obj_reference(pdf_parser::Pdf_obj_referenceContext *ctx){
 
     IR *left = nullptr;
     if(ctx->pdf_data_array()) {
-        left = POP();
+        left = pop();
     }
 
     string middle = ctx->REFERENCE()->getText();
 
     IR * ir = new IR(IR_PDF_OBJ_REF,left,nullptr,"",middle);
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_obj_stream(pdf_parser::Pdf_obj_streamContext *ctx){
 
-    IR *right = POP();
+    IR *right = pop();
 
     vector<IR *> *irv = new vector;
 
@@ -227,7 +246,7 @@ void pdf_listener::exitPdf_obj_stream(pdf_parser::Pdf_obj_streamContext *ctx){
 
     IR *ir = new IR(IR_PDF_OBJ_STREAM,left,right,"",middle,suffix);
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_xref_table(pdf_parser::Pdf_xref_tableContext *ctx){
@@ -238,7 +257,7 @@ void pdf_listener::exitPdf_xref_table(pdf_parser::Pdf_xref_tableContext *ctx){
         vector<IR *> *irv = new vector;
 
         for(auto i : ctx->pdf_xref_table()){
-            IR *ii = POP();
+            IR *ii = pop();
             irv->insert(irv->begin(),ii);
         }
         
@@ -256,28 +275,28 @@ void pdf_listener::exitPdf_xref_table(pdf_parser::Pdf_xref_tableContext *ctx){
         size_t data_array_size = ctx->pdf_data_array().size();
         switch(data_array_size){
         case 2:
-        right = POP();
-        left = POP();
+        right = pop();
+        left = pop();
         break;
         case 1:
-        left = POP();
+        left = pop();
         break;
         }
 
         ir = new(pdf_xref_table,left,right,"","",suffix);
     }
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_trailer(pdf_parser::Pdf_trailerContext *ctx){
 
-    IR *right = POP();
+    IR *right = pop();
 
     vector<IR *> *irv = new vector;
 
     for(auto i : ctx->pdf_obj_dictionary()){
-        IR *ii = POP();
+        IR *ii = pop();
         irv->insert(irv->begin(),ii);
     }
    
@@ -289,16 +308,16 @@ void pdf_listener::exitPdf_trailer(pdf_parser::Pdf_trailerContext *ctx){
 
     IR *ir = new IR(IR_PDF_TRAILER,left,right,prefix,middle,suffix);
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitPdf_data_array(pdf_parser::Pdf_data_arrayContext *ctx){
 
-    IR *right = POP();
-    IR *left = POP();
+    IR *right = pop();
+    IR *left = pop();
     IR *ir = new IR(IR_PDF_DATA_ARRAY,left,right);
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitData_int(pdf_parser::Data_intContext *ctx){
@@ -306,7 +325,7 @@ void pdf_listener::exitData_int(pdf_parser::Data_intContext *ctx){
     string text = ctx->DATA_INT()->getText();
     IR *ir = new IR(IR_DATA_INT,stoi(text));
 
-    collect_ir(ir);
+    collect(ir);
 }
 
 void pdf_listener::exitData_real(pdf_parser::Data_realContext *ctx){
@@ -314,7 +333,7 @@ void pdf_listener::exitData_real(pdf_parser::Data_realContext *ctx){
     string text = ctx->DATA_REAL()->getText();
     IR *ir = new IR(IR_DATA_REAL,stof(text));
 
-    collect_ir(ir);    
+    collect(ir);    
 }
 
 void pdf_listener::exitData_str(pdf_parser::Data_strContext *ctx){
@@ -322,5 +341,5 @@ void pdf_listener::exitData_str(pdf_parser::Data_strContext *ctx){
     string text = ctx->DATA_INT()->getText();
     IR *ir = new IR(IR_DATA_STR,text);
 
-    collect_ir(ir);
+    collect(ir);
 }
