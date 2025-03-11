@@ -1,34 +1,86 @@
+#pragma once
+
 #include "generator.hpp"
-#include "afl-fuzz.h"
-#include "afl-mutations.h"
-#include "mutator.h"
 #include <functional>
+#include <random>
 #include <cassert>
 #include <vector>
 #include <string>
 #include <stack>
 
+#ifdef __AFL__
+#include "afl-fuzz.h"
+#include "afl-mutations.h"
+
+static const unsigned int HAVOC_ALGOS = 16;
+
+#endif
+
 using std::hash;
 using std::stack;
 using std::vector;
 using std::string;
+using std::mt19937;
+using std::uniform_int_distribution;
 
-const unsigned int ROUNDS = 32;
-const unsigned int HAVOC_STEPS = 20;
-const unsigned int HAVOC_ALGOS = 16;
-const unsigned int MUTATE_ALGOS = 3;
+static const unsigned int ROUNDS = 64;
+static const unsigned int MUTATE_ALGOS = 3;
 
-constexpr unsigned int hash_str(string str){
+static constexpr unsigned int hash_str(string &str){
 
-    return hash<string>(str);
+    return hash<string>{}(str);
 }
+
+class Mutator {
+
+    private:
+        Generator *gen;
+        vector<IR *> ir_freed;
+        IR *locate(unsigned int);
+        unsigned int rand_u32(unsigned int);
+        /*  two rand_ir funcs   */
+        IR *rand_ir();
+        IR *rand_ir(IR *);
+        IR *havoc_rand_ir();
+        /* common mutation */
+        void mutation_insert(unsigned int);
+        void mutation_delete(unsigned int);
+        void mutation_replace(unsigned int);
+        /* havoc mutation */
+        void mutation_havoc();
+        
+    public:
+        string mutated;
+
+        #ifdef __AFL__
+        afl_state_t *afl;
+        Mutator(afl_state_t *afl){
+            this->afl = afl;
+        }
+        #endif
+
+        #ifdef __HonggFuzz__
+        run_t *hf;
+        Mutator(run_t *hf){
+            this->hf = hf;
+        }
+        #endif
+        ~Mutator(){
+            if(gen) delete gen;
+            for(auto i : ir_freed) delete i;
+        }
+
+        void generator(string &);
+        /*  max size as input   */
+        bool mutate(size_t);
+};
 
 void Mutator::generator(string &str){
 
-    string t = string(getenv(__TARGET__));
+    string trgt = string(getenv(__TARGET__));
     if(!t) gen = nullptr;
     
-    switch(hash_str(t)){
+    switch(hash_str(trgt)){
         #ifdef __PDF__
         case hash_str(__PDF_STR__): gen = new Generator<pdf>(str,__PDF_PATH__); break;
         #endif
@@ -43,14 +95,19 @@ bool Mutator::mutate(size_t max_len){
     gen->generate_ir();
     if(!gen->ir) return false;
 
-    /*  32 rounds havoc + mutate    */
-    unsigned int havoc_steps = 1 + rand_below(afl,HAVOC_STEPS);
+
+    ....ToDo
+
+
+    /*  64 rounds common + havoc    */
+    unsigned int havoc_steps = rand_u32(ROUNDS);
     unsigned int mutate_steps = ROUNDS - havoc_steps;
     unsigned int mutated_rand = 0;
-    /*  mutate  */
+    
+    /*  common mutate  */
     size_t size = gen->ir_library.size();
     for(auto step : mutate_steps){
-        mutated_rand = 1 + rand_below(afl,size);
+        mutated_rand = 1 + rand_u32(size);
         switch(step % MUTATE_ALGOS){
         case 0:
             mutation_insert(mutated_rand);
@@ -63,9 +120,9 @@ bool Mutator::mutate(size_t max_len){
         }
     }
 
-    /*  havoc */
+    /*  havoc mutate  */
     for(auto step : havoc_steps) {
-        mutated_rand = 1 + rand_below(afl,HAVOC_ALGOS);
+        mutated_rand = 1 + rand_u32(HAVOC_ALGOS);
         /*  havoc dict mode   */
         if(mutated_rand > 14) gen->generate_dict();
 
@@ -113,11 +170,21 @@ IR *Mutator::locate(unsigned int rand){
     return nullptr;
 }
 
+unsigned int Mutator::rand_u32(unsigned int below){
+
+    unsigned int seed = hash_str(gen->text);
+
+    mt19937 rand_gen(seed);
+    uniform_int_distribution<int> distance(0,below - 1);
+
+    return distance(rand_gen);
+}
+
 IR *Mutator::rand_ir(){
 
     size_t size = gen->ir_library->size();
 
-    unsigned int rand = rand_below(afl,size);
+    unsigned int rand = rand_u32(size);
 
     return gen->ir_library[rand];
 }
@@ -135,7 +202,7 @@ IR *Mutator::rand_ir(IR *templ){
     }
     
     size_t size = v.size();
-    unsigned int rand = rand_below(afl,size);
+    unsigned int rand = rand_u32(size);
     if(v.empty()) return templ;
 
     return v[rand];
@@ -162,7 +229,7 @@ IR *Mutator::havoc_rand_ir(){
     }
     
     size_t size = v.size();
-    unsigned int rand = rand_below(afl,size);
+    unsigned int rand = rand_u32(size);
     if(v.empty()) return nullptr;
 
     return v[rand];
@@ -188,7 +255,7 @@ void Mutator::mutation_insert(unsigned int rand){
         }
 
         size_t size = to_mutate->left->ir_vector->size();
-        unsigned int index = rand_below(afl,size);
+        unsigned int index = rand_u32(size);
 
         /*  keep synax correct  */
         chosen = rand_ir(to_mutate->left->ir_vector->begin());
@@ -204,7 +271,7 @@ void Mutator::mutation_insert(unsigned int rand){
         }
 
         size_t size = to_mutate->right->ir_vector->size();
-        unsigned int index = rand_below(afl,size);
+        unsigned int index = rand_u32(size);
 
         /*  keep synax correct  */
         chosen = rand_ir(to_mutate->right->ir_vector->begin());
@@ -237,7 +304,7 @@ void Mutator::mutation_delete(unsigned int rand){
         if(to_mutate->ir_vector->empty()) return;
 
         size_t size = to_mutate->ir_vector->size();
-        unsigned int index = rand_below(afl,size);
+        unsigned int index = rand_u32(size);
         ir_freed.push_back(to_mutate->ir_vector[index]);
         to_mutate->ir_vector->erase(index);
     }
@@ -269,7 +336,7 @@ void Mutator::mutation_replace(unsigned int rand){
     else if(to_mutate->ir_type == IR_VECTOR){
 
         size_t size = to_mutate->ir_vector->size();
-        unsigned int index = rand_below(afl,size);
+        unsigned int index = rand_u32(size);
         chosen = rand_ir(to_mutate->ir_vector[index]);
         /*  replace itself  */
         if(chosen == to_mutate->ir_vector[index]) chosen = rand_ir();
