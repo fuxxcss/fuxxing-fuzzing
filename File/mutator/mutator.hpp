@@ -35,6 +35,7 @@ class Mutator {
 
     private:
         Generator *gen;
+        unsigned int seed;
         vector<IR *> ir_freed;
         IR *locate(unsigned int);
         unsigned int rand_u32(unsigned int);
@@ -95,7 +96,8 @@ bool Mutator::mutate(size_t max_len){
     gen->generate_ir();
     if(!gen->ir) return false;
 
-
+    seed = hash_str(gen->text);
+    
     ....ToDo
 
 
@@ -172,9 +174,8 @@ IR *Mutator::locate(unsigned int rand){
 
 unsigned int Mutator::rand_u32(unsigned int below){
 
-    unsigned int seed = hash_str(gen->text);
-
     mt19937 rand_gen(seed);
+
     uniform_int_distribution<int> distance(0,below - 1);
 
     return distance(rand_gen);

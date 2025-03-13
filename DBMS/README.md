@@ -3,7 +3,6 @@
 * [Prepare DBMS](#prepare-targets)
    * [Redis](#redis)
    * [KeyDB](#keydb)
-   * [Memcached](#memcached)
    * [Redis Stack](#redis-stack)
 * [How to Install ?](#install)
 * [How to Use ?](#fuzz)
@@ -15,8 +14,7 @@ Target No-SQL DBMS:
 ``` shell
 1. Redis (key-value)
 2. KeyDB (key-value)
-3. Memcached (key-value)
-4. Redis Stack (Multi-model)
+3. Redis Stack (Multi-model)
 ```
 
 ## prepare targets
@@ -58,25 +56,6 @@ activate keydb (maybe need to trash /root/dump.rdb first) :
 > AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx /usr/local/keydb/src/keydb-server --port 6380 &
 ```
 keydb is a fork of redis,so we reuse input/redis.
-
-### memcached
-memcached fuzz required:
-- instrument memcached (disable shared)
-- libmemcached-dev (aptitude install libmemcached-dev)
-instrument memcached.
-``` shell
-> cd /usr/local/memcached
-> ./autogen.sh
-> CC=afl-clang-fast CXX=afl-clang-fast++ ./configure
-> AFL_USE_ASAN=1 make -j4
-```
-activate memcached :
-``` shell
-> AFL_DEBUG=1 /usr/local/memcached/memcached -u root -p 6381 # __afl_map_size ssss
-> ^C
-> ipcmk -M ssss -p 0666 #Shared memory id: xxxx
-> AFL_MAP_SIZE=ssss __AFL_SHM_ID=xxxx /usr/local/memcached/memcached -d -u root -p 6381
-```
 
 ### redis-stack
 redis stack fuzz required:
